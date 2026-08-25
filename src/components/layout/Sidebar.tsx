@@ -22,6 +22,10 @@ import {
  * two screens that used to sit here – Reviews and Data – moved inside Reports
  * and Settings rather than being allowed to push the count to nine.
  *
+ * Below `lg` it is not rendered at all. A seven-item column cannot become a
+ * phone nav without turning into a strip you scroll, so MobileTabBar takes over
+ * there instead – see the note in that file.
+ *
  * Neumorphically, the rail is not a dark slab beside the page. It is the same
  * surface as everything else, extruded out of it, and the CURRENT item is
  * pressed back in. That inversion is the whole state model: resting items sit
@@ -148,7 +152,7 @@ export function Sidebar({
   return (
     <nav
       aria-label="Sections"
-      className={`sticky top-0 z-30 flex shrink-0 gap-1.5 overflow-x-auto bg-canvas px-2 py-2 transition-[width,padding] duration-150 ease-out lg:my-3 lg:ml-3 lg:h-[calc(100vh-1.5rem)] lg:flex-col lg:gap-1 lg:overflow-y-auto lg:overflow-x-hidden lg:rounded-2xl lg:py-4 lg:neu-raised ${
+      className={`sticky top-0 z-30 hidden shrink-0 gap-1.5 bg-canvas transition-[width,padding] duration-150 ease-out lg:my-3 lg:ml-3 lg:flex lg:h-[calc(100vh-1.5rem)] lg:flex-col lg:gap-1 lg:overflow-y-auto lg:overflow-x-hidden lg:rounded-2xl lg:py-4 lg:neu-raised ${
         collapsed ? 'lg:w-[68px] lg:px-3.5' : 'lg:w-56 lg:px-3'
       }`}
     >
@@ -188,13 +192,6 @@ export function Sidebar({
         {render(SETTINGS)}
       </div>
 
-      {/* On the narrow layout the rail is a single scrolling row, so both ride
-          along at its end rather than being pinned to a bottom the bar has not
-          got. The switch keeps its icon-only form there. */}
-      <span className="contents lg:hidden">
-        <ThemeToggle collapsed />
-        {render(SETTINGS)}
-      </span>
     </nav>
   )
 }

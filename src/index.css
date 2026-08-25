@@ -363,6 +363,7 @@
   --animate-overlay-in: overlay-in 140ms var(--ease-out-quick);
   --animate-drawer-in: drawer-in 160ms var(--ease-out-quick);
   --animate-toast-in: toast-in 140ms var(--ease-out-quick);
+  --animate-sheet-in: sheet-in 180ms var(--ease-out-quick);
 }
 
 /* ── Depth utilities ────────────────────────────────────────────────────────
@@ -403,6 +404,14 @@
   from {
     opacity: 0;
     transform: translateX(12px);
+  }
+}
+
+/* The bottom sheet comes up from the edge it belongs to. 180ms - the top of
+   the band, because it travels further than anything else here. */
+@keyframes sheet-in {
+  from {
+    transform: translateY(100%);
   }
 }
 

@@ -34,6 +34,29 @@ export interface Column<T> {
   headerTitle?: string
 }
 
+/**
+ * What one row looks like when there is no room for a table.
+ *
+ * Below `lg` a nine-column table is a horizontal scrollbar with data hidden
+ * inside it, and the sticky first column that rescues it on a desktop only
+ * eats more of a 390px screen. So the same rows render as cards, and the page
+ * says which fields survive the squeeze rather than the table guessing.
+ *
+ * Four slots, because that is what fits: a lead badge, the identifier, one line
+ * of supporting detail, and a status on the right. Anything else belongs in the
+ * drawer, which is one tap away.
+ */
+export interface MobileCard {
+  /** Square badge on the left – initials, a category swatch, a stage dot. */
+  lead?: ReactNode
+  /** The identifier. What you scan the list for. */
+  title: ReactNode
+  /** One line. Not two. */
+  meta?: ReactNode
+  /** Status or figure, right-aligned. */
+  trailing?: ReactNode
+}
+
 export interface DataTableProps<T> {
   rows: T[]
   columns: Column<T>[]
@@ -51,6 +74,12 @@ export interface DataTableProps<T> {
   }
   /** Highlighted because it is the record currently open in the drawer. */
   activeId?: string
+  /**
+   * Card projection for narrow screens. Omit it and the table simply scrolls
+   * sideways on a phone as before - deliberately not a silent auto-guess at
+   * which columns matter, because guessing wrong hides the wrong data.
+   */
+  mobileCard?: (row: T) => MobileCard
 }
 
 export function DataTable<T>({
@@ -64,6 +93,7 @@ export function DataTable<T>({
   onOpen,
   selection,
   activeId,
+  mobileCard,
 }: DataTableProps<T>) {
   const [focused, setFocused] = useState(0)
   const [anchor, setAnchor] = useState(0)
@@ -125,7 +155,47 @@ export function DataTable<T>({
   const columnCount = columns.length + (selection ? 1 : 0)
 
   return (
-    <div className="overflow-x-auto">
+    <>
+      {mobileCard && (
+        <ul className="flex flex-col divide-y divide-line lg:hidden">
+          {loading
+            ? Array.from({ length: 6 }, (_, index) => (
+                <li key={index} className="h-16 px-3 py-3" aria-hidden="true">
+                  <span className="block h-3 w-2/5 rounded-full bg-sunken neu-pressed-sm" />
+                  <span className="mt-2 block h-3 w-3/5 rounded-full bg-sunken neu-pressed-sm" />
+                </li>
+              ))
+            : rows.map((row) => {
+                const id = getRowId(row)
+                const card = mobileCard(row)
+                const isSelected = selection?.selected.has(id) ?? false
+                return (
+                  <li key={id}>
+                    <button
+                      type="button"
+                      onClick={() => onOpen?.(row)}
+                      className={`flex w-full items-center gap-3 px-3 py-3 text-left ${
+                        isSelected ? 'bg-accent-soft' : activeId === id ? 'bg-sunken' : ''
+                      }`}
+                    >
+                      {card.lead && <span className="shrink-0">{card.lead}</span>}
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-semibold text-ink">
+                          {card.title}
+                        </span>
+                        {card.meta && (
+                          <span className="mt-0.5 block truncate text-xs text-muted">{card.meta}</span>
+                        )}
+                      </span>
+                      {card.trailing && <span className="shrink-0">{card.trailing}</span>}
+                    </button>
+                  </li>
+                )
+              })}
+        </ul>
+      )}
+
+      <div className={`overflow-x-auto ${mobileCard ? 'hidden lg:block' : ''}`}>
       <table
         className="w-full border-collapse text-left text-sm"
         style={{ minWidth: `${columnCount * 7}rem` }}
@@ -229,6 +299,7 @@ export function DataTable<T>({
           )}
         </tbody>
       </table>
-    </div>
+      </div>
+    </>
   )
 }

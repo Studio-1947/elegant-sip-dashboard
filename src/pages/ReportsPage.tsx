@@ -6,13 +6,14 @@ import { RANGES, byWeekday, filterByRange, summarise, type RangeId } from '../li
 import { productBreakdown } from '../lib/analysis'
 import { hrefFor, useQueryState, useRoute } from '../lib/router'
 import { formatCount } from '../lib/format'
-import { FilterBar, SegmentedControl } from '../components/ui/Controls'
+import { SegmentedControl } from '../components/ui/Controls'
 import { StatTile } from '../components/ui/StatTile'
 import { ChartCard } from '../components/charts/ChartCard'
 import { ColumnChart } from '../components/charts/ColumnChart'
 import { BarList } from '../components/charts/BarList'
 import { ShareBar } from '../components/charts/ShareBar'
 import { SkeletonRows } from '../components/ui/Skeleton'
+import { ChevronIcon } from '../components/ui/Icons'
 
 /* ────────────────────────────────────────────────────────────────────────────
  * Reports – the analysis that used to crowd the Home screen, plus review
@@ -30,7 +31,20 @@ const TABS = [
   { id: 'reviews', label: 'Reviews' },
 ]
 
-const DEFAULTS = { range: '30d', tab: 'performance' }
+/* On a phone Reports is a menu, not a page.
+   Four charts stacked on a 390px screen is four things you scroll past to reach
+   the fifth, and none of them is readable without turning the handset. So the
+   small layout lists what is in here and lets you pick one; the chosen section
+   then gets the whole screen to itself. On `lg` all of it renders at once, as
+   before – the room exists there. */
+const SECTIONS = [
+  { id: 'mix', label: 'Product mix', hint: 'Revenue share by tea and pack size' },
+  { id: 'sellers', label: 'Best sellers', hint: 'Top SKUs by units and revenue' },
+  { id: 'weekday', label: 'Weekday patterns', hint: 'When orders actually come in' },
+  { id: 'reviews', label: 'Review moderation', hint: 'Pending storefront reviews' },
+]
+
+const DEFAULTS = { range: '30d', tab: 'performance', section: '' }
 
 export default function ReportsPage() {
   const { orders, reviews, now } = useDataset()
@@ -44,6 +58,12 @@ export default function ReportsPage() {
   const breakdown = useMemo(() => productBreakdown(scoped, reviews), [scoped, reviews])
 
   const rangeLabel = RANGES.find((entry) => entry.id === range)?.label ?? ''
+
+  /* Below `lg`, a block is shown only when its section is the chosen one; from
+     `lg` every block is shown regardless, because the screen can hold them. */
+  const onlyOnMobileWhen = (id: string) => (values.section === id ? '' : 'hidden lg:block')
+  /* The controls and the totals belong to a section, not to the menu. */
+  const chromeVisibility = values.section ? '' : 'hidden lg:flex'
   const sold = breakdown.performance.filter((row) => row.revenue > 0)
   const topFive = sold.slice(0, 5)
   const rest = sold.slice(5)
@@ -71,7 +91,46 @@ export default function ReportsPage() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <div role="tablist" aria-label="Reports" className="flex items-center gap-1">
+      {/* The menu owns the small screen until a section is picked. */}
+      {!values.section && values.tab !== 'reviews' && (
+        <ul className="flex flex-col gap-2 lg:hidden">
+          {SECTIONS.map((section) => (
+            <li key={section.id}>
+              <a
+                href={hrefFor('reports', {
+                  query:
+                    section.id === 'reviews'
+                      ? { ...route.query, tab: 'reviews' }
+                      : { ...route.query, section: section.id },
+                })}
+                className="flex items-center gap-3 rounded-lg bg-surface px-3.5 py-3 neu-raised"
+              >
+                <span className="min-w-0 flex-1">
+                  <span className="block text-sm font-semibold text-ink">{section.label}</span>
+                  <span className="mt-0.5 block truncate text-xs text-muted">{section.hint}</span>
+                </span>
+                <span className="h-3.5 w-3.5 shrink-0 text-faint">
+                  <ChevronIcon />
+                </span>
+              </a>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {values.section && (
+        <a
+          href={hrefFor('reports', { query: { ...route.query, section: '' } })}
+          className="inline-flex h-9 w-max items-center gap-1.5 rounded-md bg-surface px-3 text-xs font-semibold text-accent neu-raised-sm lg:hidden"
+        >
+          <span className="h-3 w-3 rotate-180">
+            <ChevronIcon />
+          </span>
+          All reports
+        </a>
+      )}
+
+      <div role="tablist" aria-label="Reports" className="hidden items-center gap-1 lg:flex">
         {TABS.map((tab) => {
           const selected = values.tab === tab.id
           return (
@@ -97,7 +156,7 @@ export default function ReportsPage() {
         </Suspense>
       ) : (
         <>
-          <FilterBar>
+          <div className={`${chromeVisibility} flex-wrap items-center gap-2.5`}>
             <SegmentedControl
               label="Date range"
               value={range}
@@ -108,9 +167,12 @@ export default function ReportsPage() {
               {formatCount(scoped.length)} of {formatCount(orders.length)} orders in{' '}
               {rangeLabel.toLowerCase()}
             </p>
-          </FilterBar>
+          </div>
 
-          <section aria-label="Period totals" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          <section
+            aria-label="Period totals"
+            className={`${values.section ? 'grid' : 'hidden lg:grid'} grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4`}
+          >
             <StatTile label="Goods revenue" value={formatINR(breakdown.goodsRevenue)} hint="Excludes shipping and GST" />
             <StatTile label="GST collected" value={formatINR(totals.tax)} hint="5% on goods and shipping" />
             <StatTile label="Discounts given" value={formatINR(totals.discount)} hint={`${formatINR(totals.shipping)} shipping charged`} />
@@ -119,6 +181,7 @@ export default function ReportsPage() {
 
           <div className="grid gap-4 xl:grid-cols-2">
             <ChartCard
+              className={onlyOnMobileWhen('sellers')}
               title="Best sellers"
               subtitle="Goods revenue by tea – excludes shipping and GST"
               table={{
@@ -143,6 +206,7 @@ export default function ReportsPage() {
             </ChartCard>
 
             <ChartCard
+              className={onlyOnMobileWhen('mix')}
               title="Revenue mix"
               subtitle="Share of goods revenue"
               table={{
@@ -158,6 +222,7 @@ export default function ReportsPage() {
             </ChartCard>
 
             <ChartCard
+              className={onlyOnMobileWhen('weekday')}
               title="Orders by weekday"
               subtitle={`When customers buy · ${rangeLabel.toLowerCase()}`}
               table={{

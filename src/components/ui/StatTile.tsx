@@ -39,10 +39,14 @@ export function StatTile({
     <div className="flex flex-col justify-between rounded-lg bg-surface neu-raised px-3 py-2.5">
       <p className="text-xs font-semibold uppercase tracking-wider text-muted">{label}</p>
 
-      <div className="mt-1.5 flex items-end justify-between gap-2">
+      {/* Two-up on a phone, a tile is about 150px wide and the figure alone
+          fills it - so the trend drops to its own row underneath and takes the
+          full width. From `sm` there is room to sit them side by side again,
+          and the sparkline is capped so the number keeps the space it needs. */}
+      <div className="mt-1.5 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between sm:gap-2">
         <p className={`font-semibold leading-none text-ink ${hero ? 'text-xl' : 'text-lg'}`}>{value}</p>
         {trend && trend.length > 1 && (
-          <div className="shrink-0 pb-0.5">
+          <div className="w-full sm:w-20 sm:shrink-0 sm:pb-0.5">
             <Sparkline values={trend} />
           </div>
         )}

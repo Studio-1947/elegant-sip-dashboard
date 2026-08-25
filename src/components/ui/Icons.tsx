@@ -249,6 +249,15 @@ export const ClockIcon = (props: IconProps) => (
   </Svg>
 )
 
+/** Horizontal ellipsis - "there is more behind this". */
+export const MoreIcon = (props: IconProps) => (
+  <Svg {...props}>
+    <circle cx="5.5" cy="12" r="1.4" fill="currentColor" stroke="none" />
+    <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none" />
+    <circle cx="18.5" cy="12" r="1.4" fill="currentColor" stroke="none" />
+  </Svg>
+)
+
 export const LockIcon = (props: IconProps) => (
   <Svg {...props}>
     <rect x="4.5" y="10.5" width="15" height="10" rx="2" />

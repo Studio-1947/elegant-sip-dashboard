@@ -24,6 +24,7 @@ export function ChartCard({
   table,
   footnote,
   children,
+  className = '',
 }: {
   title: string
   subtitle?: string
@@ -31,15 +32,18 @@ export function ChartCard({
   table: TableView
   footnote?: string
   children: ReactNode
+  /** For the caller to place or gate the card - Reports uses it to show one
+      chart at a time on a phone while showing all of them on a desktop. */
+  className?: string
 }) {
   const [showTable, setShowTable] = useState(false)
   const regionId = useId()
 
   return (
-    <Card className="flex flex-col overflow-hidden">
+    <Card className={`flex flex-col overflow-hidden ${className}`}>
       <div className="flex flex-wrap items-start justify-between gap-3 px-5 pt-4">
         <div className="min-w-0">
-          <h2 className="text-sm font-bold uppercase tracking-wider text-ink">{title}</h2>
+          <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">{title}</h2>
           {subtitle && <p className="mt-1 text-xs text-body">{subtitle}</p>}
         </div>
         <button

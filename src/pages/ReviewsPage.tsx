@@ -59,7 +59,7 @@ export default function ReviewsPage() {
         />
       </FilterBar>
 
-      <section aria-label="Review figures" className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+      <section aria-label="Review figures" className="grid grid-cols-2 gap-3 xl:grid-cols-3">
         <StatTile
           label="Reviews"
           value={formatCount(all.length)}

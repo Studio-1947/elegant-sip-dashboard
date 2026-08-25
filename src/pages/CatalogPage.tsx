@@ -8,7 +8,7 @@ import { TEA_TYPES, type TeaType } from '../lib/ops'
 import { navigate, useQueryState, useRoute } from '../lib/router'
 import { formatCount, pluralise } from '../lib/format'
 import { Button, FilterBar, FilterChip, SearchInput, Select } from '../components/ui/Controls'
-import { Card, EmptyState } from '../components/ui/Card'
+import { Card, Chip, EmptyState } from '../components/ui/Card'
 import { TeaTypeChip } from '../components/ui/TeaTypeChip'
 import { DataTable, type Column } from '../components/table/DataTable'
 import { DensityToggle, TableStatus, useDensity } from '../components/table/TableToolbar'
@@ -302,6 +302,33 @@ export default function CatalogPage({ focusProduct }: { focusProduct?: string })
           getRowId={(row) => row.line.key}
           caption="Catalogue by SKU, with trade terms and stock cover"
           density={density}
+          /* On a phone the nine columns collapse to what identifies a tea and
+             what you would act on: which one it is, what it costs, and whether
+             there is any. The rest is one tap away in the drawer. The badge is
+             initials rather than a photograph – six Darjeelings are one brown
+             square at 40px, which is why the desktop table leads with the SKU
+             too. */
+          mobileCard={(row) => ({
+            lead: (
+              <span className="grid h-10 w-10 place-items-center rounded-md bg-sunken text-xs font-semibold text-accent neu-pressed-sm">
+                {row.line.variant.sku.split('-')[1]?.slice(0, 2) ?? '??'}
+              </span>
+            ),
+            title: row.line.product.name,
+            meta: `${row.line.variant.sku} · ${
+              row.line.retailPrice > 0 ? formatINR(row.line.retailPrice) : 'Unpriced'
+            }`,
+            trailing:
+              row.comingSoon || row.line.retailPrice <= 0 ? (
+                <Chip tone="warn">Unpriced</Chip>
+              ) : row.band === 'out' ? (
+                <Chip tone="critical">Out of stock</Chip>
+              ) : row.band === 'critical' || row.band === 'low' ? (
+                <Chip tone="warn">Low stock</Chip>
+              ) : (
+                <Chip tone="good">In stock</Chip>
+              ),
+          })}
           activeId={rows.find((row) => row.line.product.id === focusProduct)?.line.key}
           onOpen={(row) => navigate('catalog', { param: row.line.product.id, query: route.query })}
           empty={

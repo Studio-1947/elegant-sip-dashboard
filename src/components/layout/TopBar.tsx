@@ -45,7 +45,16 @@ export function TopBar({ title }: { title: string; description: string }) {
   const account = user?.name ?? (mode === 'demo' ? 'Demo dataset' : 'No signed-in visitor')
 
   return (
-    <header className="flex h-14 shrink-0 items-center gap-2.5 bg-canvas px-3 lg:pr-4">
+    /* Two shapes, one element. On a phone the bar wraps into two rows -
+       wordmark and actions, then a full-width search beneath - because a search
+       field sharing a row with three controls on a 390px screen is a search
+       field you cannot read the placeholder of. From `lg` it snaps back to a
+       single row and `order-*` puts search first. The alternative, rendering
+       two headers and hiding one, would have meant two copies of the palette
+       and two notification counts to keep honest. */
+    <header className="flex shrink-0 flex-wrap items-center gap-2 bg-canvas px-3 py-3 lg:h-14 lg:flex-nowrap lg:gap-2.5 lg:py-0 lg:pr-4">
+      <p className="order-1 text-md font-semibold leading-none text-ink lg:hidden">Elegant Sip</p>
+
       {/* A button, not an input: the field itself lives in the palette, where it
           can own the keyboard. Clicking here and pressing the shortcut land in
           the same place, which is the point. */}
@@ -53,7 +62,7 @@ export function TopBar({ title }: { title: string; description: string }) {
         type="button"
         onClick={() => setSearchOpen(true)}
         title="Search orders, SKUs and customers (⌘K or Ctrl+K)"
-        className="flex h-9 min-w-0 max-w-lg flex-1 items-center gap-2 rounded-full bg-sunken px-3.5 text-sm text-muted neu-pressed-sm hover:text-body"
+        className="order-3 flex h-10 w-full min-w-0 items-center gap-2 rounded-full bg-sunken px-3.5 text-sm text-muted neu-pressed-sm hover:text-body lg:order-2 lg:h-9 lg:w-auto lg:max-w-lg lg:flex-1"
       >
         <span className="h-3.5 w-3.5 shrink-0 text-faint">
           <SearchIcon />
@@ -76,7 +85,7 @@ export function TopBar({ title }: { title: string; description: string }) {
         {title}
       </span>
 
-      <div className="ml-auto flex shrink-0 items-center gap-1">
+      <div className="order-2 ml-auto flex shrink-0 items-center gap-1 lg:order-3">
         <button
           type="button"
           onClick={() => navigate('home')}

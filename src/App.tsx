@@ -4,6 +4,7 @@ import { useDataset } from './lib/datasetContext'
 import { Sidebar } from './components/layout/Sidebar'
 import { TopBar } from './components/layout/TopBar'
 import { ModeBanner } from './components/layout/ModeBanner'
+import { MobileTabBar } from './components/layout/MobileTabBar'
 import { flattenReviews } from './lib/analysis'
 import { SkeletonRows } from './components/ui/Skeleton'
 
@@ -75,11 +76,14 @@ export default function App() {
         <TopBar title={meta.title} description={meta.description} />
         <ModeBanner />
 
-        <main className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden">
+        {/* The bottom padding is the tab bar's height plus the safe area: the
+            bar is fixed, so without it the last row of every table would sit
+            underneath the thumb rest and be unreachable. */}
+        <main className="min-w-0 flex-1 overflow-y-auto overflow-x-hidden pb-[calc(4.5rem+env(safe-area-inset-bottom))] lg:pb-0">
           {/* The heading scrolls with the content it names. Persistent chrome is
               for things you reach for from anywhere; a page title is not one. */}
-          <div className="px-4 pb-1 pt-4">
-            <h1 className="text-lg font-semibold leading-tight text-ink">{meta.title}</h1>
+          <div className="px-4 pb-1 pt-3 lg:pt-4">
+            <h1 className="text-xl font-semibold leading-tight text-ink lg:text-lg">{meta.title}</h1>
             <p className="mt-0.5 text-sm text-muted">{meta.description}</p>
           </div>
 
@@ -95,6 +99,8 @@ export default function App() {
           </Suspense>
         </main>
       </div>
+
+      <MobileTabBar current={route.id} />
     </div>
   )
 }

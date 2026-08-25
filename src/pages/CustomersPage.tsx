@@ -165,7 +165,7 @@ export default function CustomersPage() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <section aria-label="Customer figures" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <section aria-label="Customer figures" className="grid grid-cols-2 gap-3 sm:gap-4 xl:grid-cols-4">
         <StatTile label="Customers" value={formatCount(customers.length)} hint="Unique email addresses" />
         <StatTile
           label="Repeat customers"
@@ -224,6 +224,21 @@ export default function CustomersPage() {
           caption={`Customers, sorted by ${SORTS.find((entry) => entry.id === sort)?.label.toLowerCase()}`}
           density={density}
           activeId={focused}
+          mobileCard={(customer) => ({
+            lead: (
+              <span className="grid h-10 w-10 place-items-center rounded-md bg-sunken text-xs font-semibold text-body neu-pressed-sm">
+                {initials(customer.name)}
+              </span>
+            ),
+            title: customer.name || customer.email,
+            meta: `${customer.email} · ${pluralise(customer.orders, 'order')}`,
+            trailing: (
+              <span className="flex flex-col items-end gap-0.5">
+                <span className="text-sm font-semibold text-ink">{formatINR(customer.spend)}</span>
+                <span className="text-xs text-muted">{relativeDays(customer.lastOrder, now)}</span>
+              </span>
+            ),
+          })}
           onOpen={(customer) => openCustomer(customer.email)}
           selection={{ selected, onChange: setSelected }}
           empty={

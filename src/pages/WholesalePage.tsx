@@ -246,7 +246,7 @@ export default function WholesalePage() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <section aria-label="Trade list at a glance" className="grid gap-4 sm:grid-cols-3">
+      <section aria-label="Trade list at a glance" className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3">
         <StatTile label="SKUs on the trade list" value={formatCount(listed.length)} hint={`of ${pluralise(lines.length, 'SKU')} in the catalogue`} />
         <StatTile label="Average gross margin" value={`${averageMargin.toFixed(0)}%`} hint="Against retail – not against cost" />
         <StatTile
@@ -303,6 +303,18 @@ export default function WholesalePage() {
           getRowId={(row) => row.line.key}
           caption={`Trade price list, sorted by ${SORTS.find((entry) => entry.id === sort)?.label.toLowerCase()}`}
           density={density}
+          mobileCard={(row) => ({
+            title: row.line.variant.sku,
+            meta: `${row.line.product.name} · MOQ ${row.line.variant.moq}`,
+            trailing: (
+              <span className="flex flex-col items-end gap-0.5">
+                <span className="text-sm font-semibold text-ink">{formatINR(row.trade)}</span>
+                <span className="text-xs text-muted">
+                  {row.margin === null ? '—' : `${row.margin.toFixed(0)}% margin`}
+                </span>
+              </span>
+            ),
+          })}
           empty={
             <EmptyState
               title="No SKUs match"

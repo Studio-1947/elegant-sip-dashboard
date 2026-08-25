@@ -255,7 +255,7 @@ export default function InventoryPage() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-      <section aria-label="Stock at a glance" className="grid gap-4 sm:grid-cols-3">
+      <section aria-label="Stock at a glance" className="grid grid-cols-2 gap-3 sm:gap-4 sm:grid-cols-3">
         <StatTile label="Packs held" value={formatCount(summary.held)} hint={`Across ${pluralise(ops.lots.length, 'lot')}`} />
         <StatTile
           label="Expiring within 90 days"
@@ -325,6 +325,24 @@ export default function InventoryPage() {
           caption={`Lots, sorted by ${SORTS.find((entry) => entry.id === sort)?.label.toLowerCase()}`}
           density={density}
           selection={{ selected, onChange: setSelected }}
+          mobileCard={(row) => ({
+            title: row.lot.code,
+            meta: `${row.line.variant.sku} · ${row.lot.garden} · ${row.lot.harvestYear}`,
+            trailing: (
+              <span className="flex flex-col items-end gap-0.5">
+                <span className="text-sm font-semibold text-ink">
+                  {formatCount(row.lot.units)} packs
+                </span>
+                <span
+                  className={`text-xs ${
+                    row.left !== null && row.left <= 90 ? 'font-semibold text-warn' : 'text-muted'
+                  }`}
+                >
+                  {row.left === null ? '—' : row.left < 0 ? `${Math.abs(row.left)}d past` : `${row.left}d left`}
+                </span>
+              </span>
+            ),
+          })}
           empty={
             <EmptyState
               title="No lots match"

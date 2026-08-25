@@ -283,6 +283,28 @@ export default function OrdersPage({ focusOrder }: { focusOrder?: string }) {
           caption={`Orders, sorted by ${SORTS.find((entry) => entry.id === sort)?.label.toLowerCase()}`}
           density={density}
           activeId={focusOrder}
+          /* Money and stage are what an order is scanned for on a phone; the
+             address and the line items live in the drawer. The stage keeps its
+             dot so the colour still has a shape beside it. */
+          mobileCard={(order) => {
+            const stage = stageOf(fulfilment, order.number)
+            return {
+              title: order.number,
+              meta: `${order.name || 'No name'} · ${formatDateTime(order.date)}`,
+              trailing: (
+                <span className="flex flex-col items-end gap-1">
+                  <span className="text-sm font-semibold text-ink">{formatINR(order.total)}</span>
+                  <span className="flex items-center gap-1.5 text-xs text-muted">
+                    <span
+                      className={`h-2 w-2 rounded-full ${stageDotClass(stage)}`}
+                      aria-hidden="true"
+                    />
+                    {stageLabel(stage)}
+                  </span>
+                </span>
+              ),
+            }
+          }}
           onOpen={(order) => openOrder(order.number)}
           selection={{ selected, onChange: setSelected }}
           empty={

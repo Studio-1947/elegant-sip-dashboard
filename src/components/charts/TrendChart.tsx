@@ -160,7 +160,16 @@ export function TrendChart({
               stroke={RULE}
               strokeWidth={1}
             />
-            <circle cx={coords[active].x} cy={coords[active].y} r={5} fill={ACCENT} stroke="#ffffff" strokeWidth={2} />
+            <circle
+              cx={coords[active].x}
+              cy={coords[active].y}
+              r={5}
+              fill={ACCENT}
+              /* The card colour, not white &mdash; on a dark theme a white ring
+                 round the hover dot is a halo the design never asked for. */
+              stroke="var(--color-surface)"
+              strokeWidth={2}
+            />
           </g>
         )}
 
