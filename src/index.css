@@ -1,0 +1,218 @@
+@import 'tailwindcss';
+
+/* ────────────────────────────────────────────────────────────────────────────
+ * Elegant Sip — operations dashboard: the design system.
+ *
+ * This is an internal tool used eight hours a day, not the storefront. The
+ * governing tone is utility over romance: precise, calm, dense. The storefront's
+ * dark green is deliberately NOT carried across — brand appears as an accent
+ * only, and green is reserved for one thing (a "good" status) so it can never be
+ * read as decoration.
+ *
+ * Four rules this file enforces, so components cannot break them by accident:
+ *
+ * 1. ONE type scale — 12/13/14/16/20/24. The `--text-*` namespace is cleared
+ *    first, so `text-2xl` and friends simply do not exist any more.
+ * 2. ONE palette — a warm neutral ramp plus a single copper accent. The
+ *    `--color-*` namespace is cleared first, so Tailwind's default 22-hue
+ *    palette is gone: `bg-blue-500` is not a class in this app.
+ * 3. Green / amber / red / blue are STATUS ONLY, never decoration, and every
+ *    status colour ships beside an icon or a text label (see Card's DotLabel).
+ * 4. Near-flat — one border colour, one shadow, radii capped at 6px.
+ * ──────────────────────────────────────────────────────────────────────────── */
+
+@theme {
+  /* ── Type ─────────────────────────────────────────────────────────────────
+     Inter, loaded in index.html with a system fallback that keeps the same
+     metrics-ish rhythm if the network is unavailable (this app is often opened
+     from a local XAMPP root with no internet). */
+  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
+
+  /* Six steps, and only six. Body text is 13–14px. */
+  --text-*: initial;
+  --text-xs: 0.75rem; /* 12 — table headers, meta, chips */
+  --text-xs--line-height: 1rem;
+  --text-sm: 0.8125rem; /* 13 — dense table body */
+  --text-sm--line-height: 1.125rem;
+  --text-base: 0.875rem; /* 14 — default body */
+  --text-base--line-height: 1.25rem;
+  --text-md: 1rem; /* 16 — drawer titles, section leads */
+  --text-md--line-height: 1.5rem;
+  --text-lg: 1.25rem; /* 20 — page title, stat values */
+  --text-lg--line-height: 1.75rem;
+  --text-xl: 1.5rem; /* 24 — the single largest figure on a screen */
+  --text-xl--line-height: 2rem;
+
+  /* ── Colour ───────────────────────────────────────────────────────────────
+     Cleared first: everything below is the entire palette of this app. */
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+  --color-inherit: inherit;
+
+  /* Warm neutral ramp, ten steps. Contrast on white:
+     n-500 3.5:1 (NON-TEXT only — icons, disabled, placeholder),
+     n-600 5.8:1, n-700 8.8:1, n-900 16.2:1. */
+  --color-n-50: #faf9f8;
+  --color-n-100: #f2f0ed;
+  --color-n-200: #e6e2dd;
+  --color-n-300: #d5d0c9;
+  --color-n-400: #b3aca3;
+  --color-n-500: #8e8880;
+  --color-n-600: #6b655e;
+  --color-n-700: #4f4a45;
+  --color-n-800: #3a352f;
+  --color-n-900: #23201d;
+
+  /* Semantic surfaces and text. Components use these, not the raw ramp. */
+  --color-canvas: #faf9f8;
+  --color-surface: #ffffff;
+  --color-sunken: #f2f0ed;
+  --color-line: #e6e2dd; /* THE border. One style, one weight, one colour. */
+  --color-line-strong: #d5d0c9; /* Structural only: table rules, dividers. */
+  --color-ink: #23201d; /* Primary text */
+  --color-body: #4f4a45; /* Secondary text */
+  --color-muted: #6b655e; /* Tertiary text — still 5.8:1 */
+  --color-faint: #8e8880; /* NEVER text: icons, placeholders, disabled */
+
+  /* The dark rail. Its own three tokens so the chrome cannot drift. */
+  --color-rail: #23201d;
+  --color-rail-text: #f2f0ed;
+  --color-rail-muted: #b3aca3;
+
+  /* ONE accent: copper. 5.6:1 on white, 5.3:1 on canvas. */
+  --color-accent: #9a5528;
+  --color-accent-strong: #7c421e; /* hover / pressed */
+  --color-accent-soft: #f7ede5; /* tint fill — 4.9:1 under accent text */
+  --color-accent-line: #e6cdb8;
+  --color-accent-on-rail: #d9915c; /* 6.3:1 on --color-rail */
+
+  /* ── Status — reserved. Never decoration, never a series colour, and never
+     used without an icon or a text label beside it. All ≥ 4.9:1 on white. */
+  --color-good: #1f7a34;
+  --color-good-soft: #e8f4ea;
+  --color-warn: #85600a;
+  --color-warn-soft: #fbf1dc;
+  --color-critical: #b3261e;
+  --color-critical-soft: #fbe9e7;
+  --color-info: #1d5fb4;
+  --color-info-soft: #e8f0fb;
+
+  /* Fulfilment stages. Ordinal, and it uses a status hue only where the stage
+     genuinely IS that status: "new" wears the accent because it wants a human,
+     the two middle stages are neutral progress, and only the terminal states
+     earn green and red. The label always ships alongside. */
+  --color-stage-new: #9a5528;
+  --color-stage-packed: #b3aca3;
+  --color-stage-shipped: #6b655e;
+  --color-stage-delivered: #1f7a34;
+  --color-stage-cancelled: #b3261e;
+
+  /* Share-of-total slots. A copper ramp, not six hues: the spec allows one
+     accent, and the four status hues are spoken for. Separation here is
+     LIGHTNESS, so slots stay distinguishable in greyscale and under every form
+     of colour blindness. Slots 1–3 carry white text, 4–6 carry ink — ShareBar
+     picks by index. */
+  --color-share-1: #4a2410;
+  --color-share-2: #7c421e;
+  --color-share-3: #9d6033;
+  --color-share-4: #c08d5f;
+  --color-share-5: #e0bd9a;
+  --color-share-6: #d5d0c9;
+
+  /* Chart furniture. */
+  --color-grid: #e6e2dd;
+  --color-rule: #d5d0c9;
+
+  /* ── Shape ────────────────────────────────────────────────────────────────
+     Near-flat. Nothing in this app is rounder than 6px, and the legacy
+     `rounded-xl` / `rounded-2xl` classes are re-pointed rather than left to
+     render a 16px pill until each component is swept. */
+  --radius-sm: 2px;
+  --radius-md: 3px;
+  --radius-lg: 4px;
+  --radius-xl: 4px;
+  --radius-2xl: 4px;
+  --radius-3xl: 6px;
+
+  /* ── Elevation ────────────────────────────────────────────────────────────
+     ONE shadow. It is for things that float above the page — drawers, the
+     command palette, toasts, the bulk-action bar. Nothing inline gets a shadow;
+     a card is separated by its border alone. */
+  --shadow-overlay: 0 10px 30px -8px rgb(35 32 29 / 0.20), 0 2px 8px -3px rgb(35 32 29 / 0.12);
+
+  /* ── Motion ───────────────────────────────────────────────────────────────
+     120–180ms ease-out, and only on things that enter or leave. Data never
+     animates: a number that fades in is a number you cannot trust at a glance. */
+  --ease-out-quick: cubic-bezier(0.22, 0.61, 0.36, 1);
+  --animate-overlay-in: overlay-in 140ms var(--ease-out-quick);
+  --animate-drawer-in: drawer-in 160ms var(--ease-out-quick);
+  --animate-toast-in: toast-in 140ms var(--ease-out-quick);
+}
+
+@keyframes overlay-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes drawer-in {
+  from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+html {
+  background: var(--color-canvas);
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: var(--text-base--line-height);
+  color: var(--color-body);
+  /* Tabular figures everywhere, inherited. Prices, quantities and weights all
+     have to line up in a column, and an ops tool has no display typography that
+     would suffer for it. `.tnum` below is now a reinforcement, not a switch. */
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Global focus ring. Never add `focus:outline-none` anywhere — it out-specifies
+   this and strands keyboard users. */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.tnum {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The one escape hatch, for the rare figure that is set large enough that
+   tabular spacing reads as loose rather than aligned. */
+.pnum {
+  font-variant-numeric: proportional-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

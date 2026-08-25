@@ -1,0 +1,3 @@
+# Internal operations tool. Not for indexing, and never linked from the shop.
+User-agent: *
+Disallow: /
