@@ -2,7 +2,11 @@
   "compilerOptions": {
     "target": "ES2022",
     "useDefineForClassFields": true,
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
@@ -14,11 +18,33 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
-    "types": ["vite/client"],
+    "types": [
+      "vite/client"
+    ],
     "baseUrl": ".",
+    /* `@storefront/*` reaches into the sibling checkout, which means tsc
+       type-checks the STOREFRONT's own source as part of this program - and on
+       a CI box that source has no node_modules beside it, so its `import from
+       'react'` could not resolve and every callback in it fell back to `any`.
+       Mapping react here points those files at the types this app already has.
+       Safe because both apps pin the same React 19.1 line, and invisible to the
+       bundler: Vite does not read tsconfig paths, and the one storefront file
+       that imports React is only ever reached through `import type`, so esbuild
+       erases it before Vite sees it. If the storefront ever imports a package
+       this app does not have, tsc will say so plainly – nothing is masked. */
     "paths": {
-      "@storefront/*": ["../Elegantsip/src/*"]
+      "@storefront/*": [
+        "../Elegantsip/src/*"
+      ],
+      "react": [
+        "./node_modules/@types/react"
+      ],
+      "react/*": [
+        "./node_modules/@types/react/*"
+      ]
     }
   },
-  "include": ["src"]
+  "include": [
+    "src"
+  ]
 }
