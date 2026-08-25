@@ -17,19 +17,19 @@ export function ModeBanner() {
 
   if (mode === 'demo') {
     return (
-      <div className="flex flex-wrap items-center gap-3 border-b border-warn/35 bg-warn-soft px-4 py-2.5 text-sm text-ink md:px-6">
-        <span className="h-4 w-4 shrink-0 text-ink">
+      <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-warn/35 bg-warn-soft px-3 py-1.5 text-sm text-ink">
+        <span className="h-3.5 w-3.5 shrink-0 text-warn">
           <AlertIcon />
         </span>
         <p className="min-w-0">
           <strong className="font-semibold">Demo data.</strong> Every figure below is simulated —
-          order numbers start <code className="rounded bg-white/70 px-1 text-xs">ES-DEMO-</code> and
+          order numbers start <code className="rounded-sm bg-surface px-1 text-xs">ES-DEMO-</code> and
           all addresses use example.com. Nothing here is a real sale.
         </p>
         <button
           type="button"
           onClick={() => navigate('settings')}
-          className="ml-auto text-xs font-semibold underline underline-offset-2"
+          className="ml-auto shrink-0 text-xs font-semibold underline underline-offset-2"
         >
           Manage datasets
         </button>
@@ -40,7 +40,7 @@ export function ModeBanner() {
   if (orders.length > 0) return null
 
   return (
-    <div className="flex flex-wrap items-center gap-3 border-b border-ink/10 bg-sunken px-4 py-2.5 text-sm text-body md:px-6">
+    <div className="flex shrink-0 flex-wrap items-center gap-2 border-b border-line bg-sunken px-3 py-1.5 text-sm text-body">
       <p className="min-w-0">
         <strong className="font-semibold text-ink">No orders in this browser yet.</strong> Live mode
         reads the storefront's own localStorage, which browsers keep per origin — so it only sees

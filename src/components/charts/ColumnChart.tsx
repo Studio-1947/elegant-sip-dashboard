@@ -86,7 +86,7 @@ export function ColumnChart({
 
       {active !== null && columns[active] && (
         <div
-          className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg border border-ink/10 bg-white px-3 py-2 text-xs shadow-sm"
+          className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg border border-line bg-surface px-3 py-2 text-xs shadow-overlay"
           style={{ left: Math.min(Math.max(centreOf(active), 60), width - 60), top: yFor(columns[active].value) - 6 }}
         >
           <p className="font-semibold text-ink">{columns[active].label}</p>

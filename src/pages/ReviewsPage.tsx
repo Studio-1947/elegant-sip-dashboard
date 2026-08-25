@@ -3,7 +3,7 @@ import { PRODUCTS } from '@storefront/data/products'
 import { useDataset } from '../lib/datasetContext'
 import { flattenReviews, ratingDistribution } from '../lib/analysis'
 import { formatCount, pluralise } from '../lib/format'
-import { FilterBar, SearchInput, Select, Button } from '../components/ui/Controls'
+import { FilterBar, SearchInput, Select } from '../components/ui/Controls'
 import { Card, CardHeader, Chip, EmptyState } from '../components/ui/Card'
 import { StatTile } from '../components/ui/StatTile'
 import { ChartCard } from '../components/charts/ChartCard'
@@ -12,12 +12,11 @@ import { StarIcon, TrashIcon } from '../components/ui/Icons'
 import { useToast } from '../components/ui/Toast'
 
 export default function ReviewsPage() {
-  const { reviews, mode, deleteReview } = useDataset()
+  const { reviews, mode, deleteReview, restoreReview } = useDataset()
   const notify = useToast()
   const [query, setQuery] = useState('')
   const [productId, setProductId] = useState<string>('all')
   const [rating, setRating] = useState<string>('all')
-  const [pendingDelete, setPendingDelete] = useState<string | null>(null)
 
   const all = useMemo(() => flattenReviews(reviews), [reviews])
 
@@ -37,7 +36,7 @@ export default function ReviewsPage() {
   const verified = all.filter((row) => row.review.verified).length
 
   return (
-    <div className="flex flex-col gap-3 p-3">
+    <div className="flex flex-col gap-3">
       <FilterBar>
         <SearchInput value={query} onChange={setQuery} label="Search reviews" placeholder="Author, text or tea" />
         <Select
@@ -113,10 +112,9 @@ export default function ReviewsPage() {
             }
           />
         ) : (
-          <ul className="divide-y divide-ink/10">
+          <ul className="divide-y divide-line">
             {rows.map((row) => {
               const key = `${row.productId}__${row.review.id}`
-              const confirming = pendingDelete === key
               return (
                 <li key={key} className="flex flex-col gap-2 px-5 py-4">
                   <div className="flex flex-wrap items-center gap-2">
@@ -129,38 +127,37 @@ export default function ReviewsPage() {
                   <p className="text-sm text-body">{row.review.text}</p>
 
                   <div className="flex items-center gap-2">
-                    {confirming ? (
-                      <>
-                        <span className="text-xs text-critical">Delete this review permanently?</span>
-                        <Button
-                          variant="danger"
-                          onClick={() => {
-                            const ok = deleteReview(row.productId, row.review.id)
-                            notify(
-                              ok ? 'Review deleted' : 'Could not write to storage — the review is still there',
-                              ok ? 'ok' : 'error',
-                            )
-                            setPendingDelete(null)
-                          }}
-                        >
-                          Yes, delete
-                        </Button>
-                        <Button variant="ghost" onClick={() => setPendingDelete(null)}>
-                          Cancel
-                        </Button>
-                      </>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => setPendingDelete(key)}
-                        className="inline-flex min-h-11 items-center gap-1.5 text-xs font-semibold text-muted hover:text-critical"
-                      >
-                        <span className="h-3.5 w-3.5">
-                          <TrashIcon />
-                        </span>
-                        Delete
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        /* Deleted immediately, with the way back in the toast.
+                           A confirm dialog here would be dismissed by the same
+                           reflex that opened it; an undo is read at leisure. */
+                        const index = (reviews[row.productId] ?? []).findIndex(
+                          (entry) => entry.id === row.review.id,
+                        )
+                        if (!deleteReview(row.productId, row.review.id)) {
+                          notify('Could not write to storage — the review is still there', 'error')
+                          return
+                        }
+                        notify(`Review by ${row.review.author} deleted`, {
+                          action: {
+                            label: 'Undo',
+                            onClick: () => {
+                              if (!restoreReview(row.productId, row.review, index)) {
+                                notify('Could not write to storage — the review is still deleted', 'error')
+                              }
+                            },
+                          },
+                        })
+                      }}
+                      className="inline-flex h-7 items-center gap-1.5 rounded-sm px-1.5 text-xs font-semibold text-muted hover:bg-critical-soft hover:text-critical"
+                    >
+                      <span className="h-3.5 w-3.5">
+                        <TrashIcon />
+                      </span>
+                      Delete
+                    </button>
                   </div>
                 </li>
               )

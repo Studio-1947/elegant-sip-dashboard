@@ -47,7 +47,7 @@ export function ChartCard({
           onClick={() => setShowTable((current) => !current)}
           aria-pressed={showTable}
           aria-controls={regionId}
-          className="inline-flex min-h-9 items-center gap-1.5 rounded-lg border border-ink/10 px-2.5 text-xs font-semibold text-body transition-colors hover:bg-sunken"
+          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-line px-2.5 text-xs font-semibold text-body hover:bg-sunken"
         >
           <span className="h-3.5 w-3.5">
             <TableIcon />
@@ -89,13 +89,13 @@ export function DataTable({ table }: { table: TableView }) {
   return (
     <div className="max-h-80 overflow-auto px-3">
       <table className="w-full border-collapse text-left text-sm">
-        <thead className="sticky top-0 bg-white">
+        <thead className="sticky top-0 bg-surface">
           <tr>
             {table.columns.map((column, index) => (
               <th
                 key={column}
                 scope="col"
-                className={`border-b border-ink/10 py-2 text-xs font-semibold uppercase tracking-wider text-muted ${
+                className={`border-b border-line py-2 text-xs font-semibold uppercase tracking-wider text-muted ${
                   index === 0 ? 'text-left' : 'text-right'
                 }`}
               >
@@ -106,7 +106,7 @@ export function DataTable({ table }: { table: TableView }) {
         </thead>
         <tbody>
           {table.rows.map((row) => (
-            <tr key={String(row[0])} className="border-b border-ink/5 last:border-0">
+            <tr key={String(row[0])} className="border-b border-line last:border-0">
               {row.map((cell, index) => (
                 <td
                   key={index}

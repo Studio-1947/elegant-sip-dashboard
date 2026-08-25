@@ -98,46 +98,106 @@ SPA rewrite rule and drops into any sub-path or static host.
 | `elegant_sip_dash_mode` | **dashboard** | live/demo preference |
 
 The dashboard writes to storefront keys in exactly **one** place: deleting a
-review on the Reviews page, which asks first.
+review, which happens immediately and offers undo in the toast rather than
+asking first.
 
 Fulfilment stage (New → Packed → Shipped → Delivered, or Cancelled) is the
 dashboard's own field — `PlacedOrder` has no status, and adding one would mean the
 storefront had to tolerate it on read. It is a local operational note: nothing is
 emailed to the customer.
 
+## The operations overlay
+
+The storefront's `Product` has no SKU, no weight as a number, no trade price, no
+minimum order quantity and no concept of a **lot**. A shop does not need them; a
+back office cannot work without them. Rather than fork the catalogue, those
+fields live in the dashboard's own `elegant_sip_dash_ops` key and join to the
+storefront's records by product id — the same move `fulfilment.ts` already makes
+for order stages.
+
+It seeds itself on first run, **derived, never invented**: SKUs are built from
+product ids and sizes (`ES-FFWL-CLS-100`), trade prices start at 60% of retail,
+and each variant's published stock is split into two lots — so the packs held for
+a SKU sum to exactly what the shop publishes until someone edits them here. Every
+screen that shows overlay data says it is the dashboard's record, not the shop's,
+and Settings can reseed it behind a type-to-confirm.
+
+`inventory.ts` joins the overlay to real orders to answer the questions a raw
+stock number cannot: days of cover (units ÷ trailing 30-day velocity, `null` when
+a SKU has never sold — never Infinity, which would look like comfort), FIFO order
+across lots, and what expires within 90 days.
+
+## Design system
+
+The tone is **utility over romance**: this is an internal tool used eight hours a
+day, not the storefront. The storefront's dark green is deliberately not carried
+across. `src/index.css` clears Tailwind's `--text-*` and `--color-*` namespaces
+first, so the constraints below are enforced by the framework rather than by
+discipline — `text-2xl` and `bg-blue-500` are not classes in this app.
+
+- **One scale** — 12/13/14/16/20/24. Body is 13–14px.
+- **One accent** — copper `#9a5528`, 5.6:1 on white. Plus a ten-step warm neutral
+  ramp. `n-500` is documented as non-text (3.5:1).
+- **Green, amber, red and blue are status only**, never decoration, and never
+  used without an icon or a text label beside them.
+- **Tabular figures are inherited from `body`**, not opted into per cell.
+- **Near-flat** — one border colour, radii capped at 6px, and exactly one shadow,
+  reserved for things that float: drawer, palette, toast, bulk bar.
+- **Motion is 120–180ms ease-out on drawers and toasts only.** Nothing animates
+  on data load — skeleton rows are static, because a shimmer is motion pulling
+  the eye to the one thing not worth looking at.
+
 ## Charts
 
-Colour is assigned by the method in the `dataviz` skill, and the categorical
-palette was **validated, not eyeballed**:
+Colour is assigned by the method in the `dataviz` skill:
 
-- **Single-series marks** (revenue trend, best sellers, weekday columns, ratings)
-  wear the brand accent `#4a7333` — 5.29:1 on white. One series, one colour: a
-  value-ramp across nominal categories would double-encode length as hue.
-- **The categorical order** `#008300 · #2a78d6 · #eb6834 · #4a3aa7 · #eda100 · #e87ba4`
-  clears every adjacent gate on the light surface (worst adjacent CVD ΔE 16.3,
-  normal-vision ΔE 19.6). **The order is the safety mechanism** — green beside
-  orange fails protan separation at ΔE 3.2. Do not reorder or extend it without
-  re-running the validator.
+- **Single-series marks** (revenue trend, best sellers, weekday columns) wear the
+  accent. One series, one colour: a value-ramp across nominal categories would
+  double-encode length as hue.
+- **Part-to-whole slots are a copper ramp, not six hues.** The four status hues
+  are spoken for and the system allows one accent, so the share bar separates by
+  **lightness** — which is also more robust than a rainbow, staying legible in
+  greyscale and under every form of colour blindness. Slots 1–3 carry white
+  labels, 4–6 carry ink.
+- **Category chips are the liquor colour** — black darkest, white palest, along
+  the same ramp. Oxidation is what the categories are really about, so this codes
+  them more truthfully than "green tea in green" would, and it keeps green free
+  to mean "good".
 - **Colour follows the entity, not the rank.** A tea's slot comes from its
   catalogue position, so changing the date range never repaints the survivors.
 - **Every chart has a table twin** (the "Table" toggle) and every trend chart is
   keyboard-readable with arrow keys. A tooltip never gates a value.
-- `#8bb56e` is 2.24:1 on paper and is used only as a decorative fill, never for
-  text on a light background.
 
 ## Conventions
 
 Same as the storefront: max 300 lines per file, Tailwind utilities inline, inline
-stroke SVG icons (**no emoji in UI**), 44×44px minimum touch targets, and
-**never `focus:outline-none`** — it out-specifies the global `:focus-visible` ring.
+stroke SVG icons (**no emoji in UI**) and **never `focus:outline-none`** — it
+out-specifies the global `:focus-visible` ring.
+
+Controls are **36px, not the storefront's 44px**. This is a pointer-first tool at
+desk density; 36px still clears the WCAG 2.2 target-size minimum comfortably, and
+the saving compounds across a toolbar of six. Table rows are 44px, or 32px in
+compact mode — a per-browser preference, not a filter, so it never rides along in
+a shared link.
+
+**View state lives in the URL** (`#/orders?stage=new&q=darjeeling`) and interface
+preferences live in `preferences.ts`. The split is: the URL is *what you are
+looking at*, preferences are *how you like to look at it*. Saved views are just
+named query strings, which is why they cost nothing.
 
 ## What this dashboard deliberately cannot do
 
-- Edit prices, stock or product status. Those live in the storefront's
-  `data/products.ts` and change with a build, not from this screen.
+- Edit **retail** prices or product status. Those live in the storefront's
+  `data/products.ts` and change with a build, not from this screen. Trade prices,
+  minimums, weights, tea types and lots are the dashboard's own and are editable
+  inline.
 - Notify a customer. Stages and moderation are local records.
 - See orders from another device, browser or origin — there is no server.
-- Report stock on hand, or verify a payment.
+- Decrement stock when an order is placed. Lots are adjusted by hand; the
+  storefront never tells this app that a sale happened.
+- Verify a payment, process a refund, or see a subscription. The Home screen
+  names those four gaps out loud rather than letting an all-clear be read as
+  "nothing is wrong" when whole categories were never checked.
 
 All of it is a wiring job once the first API exists: the aggregation layer in
 `src/lib/` is pure functions over an order array, and only `storage.ts` and

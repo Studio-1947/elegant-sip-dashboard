@@ -66,10 +66,48 @@ export function readFulfilment(): FulfilmentStore {
 export const stageOf = (store: FulfilmentStore, orderNumber: string): Stage =>
   store[orderNumber]?.stage ?? 'new'
 
-export function setStage(store: FulfilmentStore, orderNumber: string, stage: Stage): FulfilmentStore {
+/**
+ * Returns whether the write actually landed. It used to return the new store
+ * unconditionally, which meant a quota-exceeded or private-mode failure showed
+ * a stage change on screen that no longer existed after a reload — the UI
+ * reporting a success that never happened, which is the one thing this app is
+ * not allowed to do. Callers surface `ok: false` rather than a tick.
+ */
+export function setStage(
+  store: FulfilmentStore,
+  orderNumber: string,
+  stage: Stage,
+): { store: FulfilmentStore; ok: boolean } {
   const next: FulfilmentStore = { ...store, [orderNumber]: { stage, updatedAt: new Date().toISOString() } }
-  writeJson(DASHBOARD_KEYS.fulfilment, next)
-  return next
+  const ok = writeJson(DASHBOARD_KEYS.fulfilment, next)
+  return { store: ok ? next : store, ok }
+}
+
+/** The same, for a whole selection — one write, so a bulk change is atomic. */
+export function setStages(
+  store: FulfilmentStore,
+  orderNumbers: string[],
+  stage: Stage,
+): { store: FulfilmentStore; ok: boolean } {
+  const updatedAt = new Date().toISOString()
+  const next: FulfilmentStore = { ...store }
+  for (const number of orderNumbers) next[number] = { stage, updatedAt }
+  const ok = writeJson(DASHBOARD_KEYS.fulfilment, next)
+  return { store: ok ? next : store, ok }
+}
+
+/** Restores exactly what was there before — the undo behind the toast. */
+export function restoreStages(
+  store: FulfilmentStore,
+  previous: Record<string, StageEntry | undefined>,
+): { store: FulfilmentStore; ok: boolean } {
+  const next: FulfilmentStore = { ...store }
+  for (const [number, entry] of Object.entries(previous)) {
+    if (entry) next[number] = entry
+    else delete next[number]
+  }
+  const ok = writeJson(DASHBOARD_KEYS.fulfilment, next)
+  return { store: ok ? next : store, ok }
 }
 
 /** Tailwind class for a stage dot. The label always ships beside it — a stage

@@ -19,6 +19,7 @@ import {
   type ReactNode,
 } from 'react'
 import type { PlacedOrder } from '@storefront/lib/orders'
+import type { Review } from '@storefront/data/products'
 import {
   DASHBOARD_KEYS,
   STOREFRONT_KEYS,
@@ -32,7 +33,16 @@ import {
   type ReviewStore,
 } from './storage'
 import { buildDemoDataset } from './demoData'
-import { readFulfilment, setStage as persistStage, type FulfilmentStore, type Stage } from './fulfilment'
+import {
+  readFulfilment,
+  restoreStages,
+  setStage as persistStage,
+  setStages as persistStages,
+  type FulfilmentStore,
+  type Stage,
+  type StageEntry,
+} from './fulfilment'
+import { buildOpsSeed, readOps, writeOps, type Lot, type OpsStore, type TeaType, type VariantOps } from './ops'
 
 export type DataMode = 'live' | 'demo'
 
@@ -57,8 +67,21 @@ interface DatasetValue extends Snapshot {
   seedDemo: () => boolean
   clearDemo: () => void
   fulfilment: FulfilmentStore
-  updateStage: (orderNumber: string, stage: Stage) => void
+  /** All of these report whether the write landed — never assume it did. */
+  updateStage: (orderNumber: string, stage: Stage) => boolean
+  updateStages: (orderNumbers: string[], stage: Stage) => boolean
+  /** Puts back exactly what a bulk change replaced. Powers the undo toast. */
+  undoStages: (previous: Record<string, StageEntry | undefined>) => boolean
+  stageSnapshot: (orderNumbers: string[]) => Record<string, StageEntry | undefined>
   deleteReview: (productId: string, reviewId: string) => boolean
+  restoreReview: (productId: string, review: Review, index: number) => boolean
+
+  /* ── The operations overlay (see ops.ts) ── */
+  ops: OpsStore
+  updateVariantOps: (key: string, patch: Partial<VariantOps>) => boolean
+  updateLot: (id: string, patch: Partial<Lot>) => boolean
+  setTeaType: (productId: string, type: TeaType) => boolean
+  reseedOps: () => boolean
 }
 
 const EMPTY: Snapshot = {
@@ -181,9 +204,77 @@ export function DatasetProvider({ children }: { children: ReactNode }) {
     setSnapshot(readSnapshot('live'))
   }, [])
 
-  const updateStage = useCallback((orderNumber: string, stage: Stage) => {
-    setFulfilment((current) => persistStage(current, orderNumber, stage))
+  /* Optimistic by construction: the write is synchronous, so the screen and the
+     store move together and there is no pending state to render. What the
+     caller gets back is whether it actually landed. */
+  const updateStage = useCallback((orderNumber: string, stage: Stage): boolean => {
+    const result = persistStage(readFulfilment(), orderNumber, stage)
+    setFulfilment(result.store)
+    return result.ok
   }, [])
+
+  const updateStages = useCallback((orderNumbers: string[], stage: Stage): boolean => {
+    const result = persistStages(readFulfilment(), orderNumbers, stage)
+    setFulfilment(result.store)
+    return result.ok
+  }, [])
+
+  const undoStages = useCallback((previous: Record<string, StageEntry | undefined>): boolean => {
+    const result = restoreStages(readFulfilment(), previous)
+    setFulfilment(result.store)
+    return result.ok
+  }, [])
+
+  /** What the stages were, so undo restores rather than guesses. */
+  const stageSnapshot = useCallback(
+    (orderNumbers: string[]): Record<string, StageEntry | undefined> => {
+      const current = readFulfilment()
+      const snapshot: Record<string, StageEntry | undefined> = {}
+      for (const number of orderNumbers) snapshot[number] = current[number]
+      return snapshot
+    },
+    [],
+  )
+
+  /* The overlay seeds itself on first run rather than presenting an empty
+     Inventory screen with no way in. Everything it contains is derived from the
+     catalogue, and every screen that shows it says where it came from. */
+  const [ops, setOps] = useState<OpsStore>(() => {
+    const existing = readOps()
+    if (existing) return existing
+    const seeded = buildOpsSeed(new Date())
+    writeOps(seeded)
+    return seeded
+  })
+
+  const commitOps = useCallback((next: OpsStore): boolean => {
+    if (!writeOps(next)) return false
+    setOps(next)
+    return true
+  }, [])
+
+  const updateVariantOps = useCallback(
+    (key: string, patch: Partial<VariantOps>): boolean => {
+      const current = ops.variants[key]
+      if (!current) return false
+      return commitOps({ ...ops, variants: { ...ops.variants, [key]: { ...current, ...patch } } })
+    },
+    [ops, commitOps],
+  )
+
+  const updateLot = useCallback(
+    (id: string, patch: Partial<Lot>): boolean =>
+      commitOps({ ...ops, lots: ops.lots.map((lot) => (lot.id === id ? { ...lot, ...patch } : lot)) }),
+    [ops, commitOps],
+  )
+
+  const setTeaType = useCallback(
+    (productId: string, type: TeaType): boolean =>
+      commitOps({ ...ops, teaTypes: { ...ops.teaTypes, [productId]: type } }),
+    [ops, commitOps],
+  )
+
+  const reseedOps = useCallback((): boolean => commitOps(buildOpsSeed(new Date())), [commitOps])
 
   /* The one write that touches customer-facing data. The Reviews page confirms
      first, and the storefront will simply stop showing the review. */
@@ -194,6 +285,26 @@ export function DatasetProvider({ children }: { children: ReactNode }) {
       const list = (store[productId] ?? []).filter((review) => review.id !== reviewId)
       if (list.length === 0) delete store[productId]
       else store[productId] = list
+      if (!writeJson(key, store)) return false
+      setSnapshot(readSnapshot(mode))
+      return true
+    },
+    [mode],
+  )
+
+  /* The other half of the review delete. Because this can put a review back
+     exactly where it was, deleting one does not need a confirmation step — it
+     needs an undo, which is faster in the common case and safer in the rare
+     one. The index is carried so a restore does not silently reorder the list. */
+  const restoreReview = useCallback(
+    (productId: string, review: Review, index: number): boolean => {
+      const key = mode === 'demo' ? DASHBOARD_KEYS.demoReviews : STOREFRONT_KEYS.reviews
+      const store = readReviews(key).value
+      const list = [...(store[productId] ?? [])]
+      if (!list.some((entry) => entry.id === review.id)) {
+        list.splice(Math.min(Math.max(index, 0), list.length), 0, review)
+      }
+      store[productId] = list
       if (!writeJson(key, store)) return false
       setSnapshot(readSnapshot(mode))
       return true
@@ -213,9 +324,39 @@ export function DatasetProvider({ children }: { children: ReactNode }) {
       clearDemo,
       fulfilment,
       updateStage,
+      updateStages,
+      undoStages,
+      stageSnapshot,
       deleteReview,
+      restoreReview,
+      ops,
+      updateVariantOps,
+      updateLot,
+      setTeaType,
+      reseedOps,
     }),
-    [snapshot, mode, setMode, now, refresh, demoPresent, seedDemo, clearDemo, fulfilment, updateStage, deleteReview],
+    [
+      snapshot,
+      mode,
+      setMode,
+      now,
+      refresh,
+      demoPresent,
+      seedDemo,
+      clearDemo,
+      fulfilment,
+      updateStage,
+      updateStages,
+      undoStages,
+      stageSnapshot,
+      deleteReview,
+      restoreReview,
+      ops,
+      updateVariantOps,
+      updateLot,
+      setTeaType,
+      reseedOps,
+    ],
   )
 
   return <DatasetContext.Provider value={value}>{children}</DatasetContext.Provider>

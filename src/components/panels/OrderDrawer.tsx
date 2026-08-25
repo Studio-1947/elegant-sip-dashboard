@@ -2,11 +2,11 @@ import type { PlacedOrder } from '@storefront/lib/orders'
 import { formatINR } from '@storefront/lib/currency'
 import { SHIPPING_METHODS, getOrderPricing } from '@storefront/lib/pricing'
 import { useDataset } from '../../lib/datasetContext'
+import { variantKey } from '../../lib/ops'
 import { STAGES, stageDotClass, stageOf } from '../../lib/fulfilment'
 import { formatDateTime } from '../../lib/format'
 import { Drawer } from '../ui/Drawer'
 import { Button } from '../ui/Controls'
-import { Thumb } from '../ui/Thumb'
 import { Chip } from '../ui/Card'
 import { useToast } from '../ui/Toast'
 import { AlertIcon } from '../ui/Icons'
@@ -21,7 +21,7 @@ export function OrderDrawer({
   onClose: () => void
   onOpenProduct: (productId: string) => void
 }) {
-  const { fulfilment, updateStage } = useDataset()
+  const { fulfilment, updateStage, ops } = useDataset()
   const notify = useToast()
 
   if (!order) return null
@@ -58,7 +58,7 @@ export function OrderDrawer({
             {order.email && (
               <a
                 href={`mailto:${order.email}?subject=${encodeURIComponent(`Your Elegant Sip order ${order.number}`)}`}
-                className="inline-flex min-h-11 items-center rounded-md border border-ink bg-ink px-4 text-sm font-semibold text-white hover:bg-ink/90"
+                className="inline-flex h-9 items-center rounded-md border border-ink bg-ink px-4 text-sm font-semibold text-white hover:bg-ink/90"
               >
                 Email customer
               </a>
@@ -83,8 +83,8 @@ export function OrderDrawer({
                     updateStage(order.number, entry.id)
                     notify(`${order.number} marked ${entry.label.toLowerCase()}`)
                   }}
-                  className={`inline-flex min-h-11 items-center gap-2 rounded-md border px-3 text-sm font-semibold transition-colors ${
-                    active ? 'border-ink bg-ink text-white' : 'border-ink/15 bg-white text-body hover:bg-sunken'
+                  className={`inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm font-semibold ${
+                    active ? 'border-ink bg-ink text-white' : 'border-line bg-surface text-body hover:bg-sunken'
                   }`}
                 >
                   <span className={`h-2.5 w-2.5 rounded-full ${stageDotClass(entry.id)}`} aria-hidden="true" />
@@ -100,24 +100,25 @@ export function OrderDrawer({
 
         <section>
           <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">Items</h3>
-          <ul className="mt-2 flex flex-col divide-y divide-ink/10 rounded-lg border border-ink/10 bg-white">
+          <ul className="mt-2 flex flex-col divide-y divide-line rounded-lg border border-line bg-surface">
             {order.items.map((item) => (
-              <li key={`${item.id}__${item.size}`} className="flex items-center gap-3 p-3">
-                <Thumb imageSrc={item.imageSrc} name={item.name} />
+              <li key={`${item.id}__${item.size}`} className="flex items-center gap-3 px-3 py-2">
+                {/* Led by the SKU, not a photo. Six Darjeelings are one blurred
+                    brown square at 40px; the SKU says which one is in the box. */}
                 <div className="min-w-0 flex-1">
                   <button
                     type="button"
                     onClick={() => onOpenProduct(item.id)}
-                    className="block truncate text-sm font-semibold text-ink hover:underline"
+                    className="block truncate text-sm font-semibold text-ink hover:text-accent hover:underline"
                   >
-                    {item.name}
+                    {ops.variants[variantKey(item.id, item.size)]?.sku ?? item.id}
                   </button>
                   <p className="truncate text-xs text-muted">
-                    {item.size || 'Unspecified size'} · {formatINR(item.price)} each
+                    {item.name} · {item.size || 'Unspecified size'} · {formatINR(item.price)} each
                   </p>
                 </div>
-                <p className="tnum shrink-0 text-sm text-body">×{item.quantity}</p>
-                <p className="tnum w-24 shrink-0 text-right text-sm font-semibold text-ink">
+                <p className="shrink-0 text-sm text-body">×{item.quantity}</p>
+                <p className="w-24 shrink-0 text-right text-sm font-semibold text-ink">
                   {formatINR(item.price * item.quantity)}
                 </p>
               </li>
@@ -127,7 +128,7 @@ export function OrderDrawer({
 
         <section>
           <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">Charged</h3>
-          <dl className="mt-2 flex flex-col gap-1.5 rounded-lg border border-ink/10 bg-white p-4 text-sm">
+          <dl className="mt-2 flex flex-col gap-1.5 rounded-lg border border-line bg-surface p-4 text-sm">
             <Row label="Goods" value={formatINR(order.subtotal)} />
             {order.discount > 0 && (
               <Row label={`Discount${order.coupon ? ` · ${order.coupon}` : ''}`} value={`−${formatINR(order.discount)}`} />
@@ -137,7 +138,7 @@ export function OrderDrawer({
               value={order.shippingFee === 0 ? 'Free' : formatINR(order.shippingFee)}
             />
             <Row label="GST (5%)" value={formatINR(order.tax)} />
-            <div className="mt-1 flex items-baseline justify-between border-t border-ink/10 pt-2">
+            <div className="mt-1 flex items-baseline justify-between border-t border-line pt-2">
               <dt className="font-semibold text-ink">Total</dt>
               <dd className="tnum text-base font-bold text-ink">{formatINR(order.total)}</dd>
             </div>
@@ -161,7 +162,7 @@ export function OrderDrawer({
 
         <section>
           <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">Ship to</h3>
-          <address className="mt-2 rounded-lg border border-ink/10 bg-white p-4 text-sm not-italic text-body">
+          <address className="mt-2 rounded-lg border border-line bg-surface p-4 text-sm not-italic text-body">
             <p className="font-semibold text-ink">{order.name || 'Name not recorded'}</p>
             <p>{order.address || '—'}</p>
             <p>

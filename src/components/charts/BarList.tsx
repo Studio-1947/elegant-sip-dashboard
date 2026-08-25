@@ -30,7 +30,7 @@ export function BarList({
   return (
     <ul className="flex flex-col gap-3 px-3 py-1">
       {items.map((item) => (
-        <li key={item.id} className="group rounded-lg px-2 py-1.5 transition-colors hover:bg-sunken">
+        <li key={item.id} className="group rounded-lg px-2 py-1.5 hover:bg-sunken">
           <div className="flex items-baseline justify-between gap-3">
             <div className="min-w-0">
               <p className="truncate text-sm font-semibold text-ink">{item.label}</p>
