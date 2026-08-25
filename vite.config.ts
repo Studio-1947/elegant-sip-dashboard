@@ -2,8 +2,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
-import { existsSync } from 'node:fs'
-import { fileURLToPath } from 'node:url'
+import { assertStorefrontPresent } from './scripts/check-storefront.mjs'
 
 /* ────────────────────────────────────────────────────────────────────────────
  * The dashboard is a separate app, but it is NOT allowed a second copy of the
@@ -13,15 +12,7 @@ import { fileURLToPath } from 'node:url'
  * seoRoutes.ts. If the sibling checkout is missing, fail loudly at config time
  * rather than at a red squiggle deep in a component.
  * ──────────────────────────────────────────────────────────────────────────── */
-const storefrontSrc = fileURLToPath(new URL('../Elegantsip/src', import.meta.url))
-
-if (!existsSync(storefrontSrc)) {
-  throw new Error(
-    `Storefront source not found at ${storefrontSrc}.\n` +
-    'The dashboard imports the catalogue and pricing rules directly from the ' +
-    'Elegantsip storefront, which must sit beside this folder. See README.md.',
-  )
-}
+const storefrontSrc = assertStorefrontPresent()
 
 export default defineConfig({
   // Relative asset URLs so the built app works from any sub-path  XAMPP serves

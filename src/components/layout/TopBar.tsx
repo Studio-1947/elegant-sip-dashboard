@@ -47,23 +47,29 @@ export function TopBar({ title }: { title: string; description: string }) {
   return (
     <header className="flex h-14 shrink-0 items-center gap-2.5 bg-canvas px-3 lg:pr-4">
       {/* A button, not an input: the field itself lives in the palette, where it
-          can own the keyboard. Clicking here and pressing ⌘K land in the same
-          place, which is the point. */}
+          can own the keyboard. Clicking here and pressing the shortcut land in
+          the same place, which is the point. */}
       <button
         type="button"
         onClick={() => setSearchOpen(true)}
+        title="Search orders, SKUs and customers (⌘K or Ctrl+K)"
         className="flex h-9 min-w-0 max-w-lg flex-1 items-center gap-2 rounded-full bg-sunken px-3.5 text-sm text-muted neu-pressed-sm hover:text-body"
       >
         <span className="h-3.5 w-3.5 shrink-0 text-faint">
           <SearchIcon />
         </span>
         <span className="truncate">Search orders, SKUs and customers</span>
-        <kbd className="ml-auto hidden shrink-0 rounded-sm bg-surface px-1.5 text-xs text-muted neu-raised-sm sm:block">
-          ⌘K 
-        </kbd>
-        <kbd className="hidden shrink-0 rounded-sm bg-surface px-1.5 text-xs text-muted neu-raised-sm sm:block">
-          Ctrl +K
-        </kbd>
+        {/* Both, because the handler genuinely accepts both (metaKey || ctrlKey)
+            and this app is opened on Windows and macOS alike. Each is written in
+            its own platform's convention - Apple omits the plus, Windows keeps
+            it - rather than forcing one house style onto the other. The pair is
+            aria-hidden: it is a picture of the keys, and the button's title says
+            the same thing in words. */}
+        <span className="ml-auto hidden shrink-0 items-center gap-1 sm:flex" aria-hidden="true">
+          <kbd className="rounded-sm bg-surface px-1.5 text-xs text-muted neu-raised-sm">⌘K</kbd>
+          <span className="text-xs text-faint">/</span>
+          <kbd className="rounded-sm bg-surface px-1.5 text-xs text-muted neu-raised-sm">Ctrl+K</kbd>
+        </span>
       </button>
 
       <span className="sr-only" aria-live="polite">
