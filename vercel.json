@@ -1,0 +1,6 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "git clone --depth 1 https://github.com/Studio-1947/elegant-sip.git ../Elegantsip && npm ci",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist"
+}

@@ -86,6 +86,33 @@ import { formatINR } from '@storefront/lib/currency'
 **The storefront must sit beside this folder.** `vite.config.ts` throws at config
 time with a clear message if it does not.
 
+### Deploying it
+
+A hosting platform clones one repository, so the sibling is never present by
+default – which is why a Vercel build failed with `looked in:
+/vercel/Elegantsip/src`. `vercel.json` fixes it in the install step:
+
+```json
+"installCommand": "git clone --depth 1 https://github.com/Studio-1947/elegant-sip.git ../Elegantsip && npm ci"
+```
+
+Vercel checks this repo out at `/vercel/path0`, so `../Elegantsip` lands exactly
+where the alias looks. The storefront repo is public, so no credentials are
+needed. On another platform, run the same clone before `npm run build`.
+
+**The trade-off, stated plainly:** this tracks the storefront's default branch,
+so a commit over there can break a build here with no commit on this side. That
+is the price of one source of truth rather than a vendored copy, and it is the
+right price while the two apps ship together. If they ever stop, pin it – swap
+`--depth 1` for `--branch <tag>` – or promote the six files below to a real
+shared package.
+
+The dashboard only reaches for **6 of the storefront's 82 source files**:
+`data/products.ts`, `data/content.ts`, `lib/currency.ts`, `lib/orders.ts`,
+`lib/pricing.ts` and `components/CartContext.tsx` – the last only for the
+`CartItem` type, which is erased at runtime. That is the whole contract, and it
+is what a shared package would need to contain.
+
 ## Stack
 
 Vite 7 + React 19 + TypeScript (strict) + Tailwind CSS v4  the storefront's
