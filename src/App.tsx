@@ -69,7 +69,7 @@ export default function App() {
        That is what makes a sticky table header stick to the top of the DATA
        rather than to the top of the browser window – the rail, the top bar and
        the mode banner stay put above it, and the header lands just under them. */
-    <div className="flex h-screen flex-col overflow-hidden bg-canvas lg:flex-row">
+    <div className="flex h-dvh flex-col overflow-hidden bg-canvas lg:flex-row">
       <Sidebar current={route.id} counts={counts} />
 
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">

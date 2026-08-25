@@ -152,7 +152,7 @@ export function Sidebar({
   return (
     <nav
       aria-label="Sections"
-      className={`sticky top-0 z-30 hidden shrink-0 gap-1.5 bg-canvas transition-[width,padding] duration-150 ease-out lg:my-3 lg:ml-3 lg:flex lg:h-[calc(100vh-1.5rem)] lg:flex-col lg:gap-1 lg:overflow-y-auto lg:overflow-x-hidden lg:rounded-2xl lg:py-4 lg:neu-raised ${
+      className={`sticky top-0 z-30 hidden shrink-0 gap-1.5 bg-canvas transition-[width,padding] duration-150 ease-out lg:my-3 lg:ml-3 lg:flex lg:h-[calc(100dvh-1.5rem)] lg:flex-col lg:gap-1 lg:overflow-y-auto lg:overflow-x-hidden lg:rounded-2xl lg:py-4 lg:neu-raised ${
         collapsed ? 'lg:w-[68px] lg:px-3.5' : 'lg:w-56 lg:px-3'
       }`}
     >

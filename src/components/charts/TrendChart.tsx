@@ -9,6 +9,11 @@ export interface TrendPoint {
 
 const PAD = { top: 16, right: 18, bottom: 26, left: 56 }
 
+/* Width of a rendered axis date ("27 Jul") at 12px, in px. Measuring each label
+   properly would mean a DOM round-trip per tick for a value that never varies –
+   every label on this axis is the same shape. */
+const LABEL_W = 42
+
 /**
  * One series over time: 2px line, a 10% wash beneath it, hairline grid, and a
  * crosshair on hover. Segments are straight – a smoothed curve would draw
@@ -113,10 +118,23 @@ export function TrendChart({
         {points.length === 1 && <circle cx={coords[0].x} cy={coords[0].y} r={4} fill={ACCENT} />}
 
         {points.map((point, index) => {
-          // The last day is always labelled; a strided label too close to it is
-          // dropped rather than allowed to overprint ("23 Aug24 Aug").
+          /* Which labels survive, and why the old rule was not enough.
+             A date like "27 Jul" is about {LABEL_W}px at 12px. An interior label is
+             centre-anchored, so it reaches half that each way; the FIRST and
+             LAST are anchored start/end, so they reach their FULL width inwards.
+             The old guard compared against 46px – roughly one label width – which
+             is the right number for two centred labels and far too small next to
+             an end-anchored one. It needed half-of-mine plus all-of-theirs.
+             On a desktop the gap happened to be wide enough to hide the error;
+             on a phone the plot is a third as wide and it printed "20 Au25 Aug".
+             Interior collisions are already handled upstream by `stride`. */
+          const clearsEdge = (edgeIndex: number) =>
+            Math.abs(xFor(index) - xFor(edgeIndex)) > LABEL_W + LABEL_W / 2 + 4
+
           const show =
-            index === lastIndex || (index % stride === 0 && xFor(lastIndex) - xFor(index) > 46)
+            index === 0 ||
+            index === lastIndex ||
+            (index % stride === 0 && clearsEdge(0) && clearsEdge(lastIndex))
           if (!show) return null
           return (
             <text

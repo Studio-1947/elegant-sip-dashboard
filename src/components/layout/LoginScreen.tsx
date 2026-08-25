@@ -87,7 +87,15 @@ function LoginScreen({ onUnlock }: { onUnlock: () => void }) {
   }
 
   return (
-    <div className="relative flex min-h-screen items-center justify-center bg-canvas p-4">
+    /* `dvh`, not `vh`. On a phone `100vh` is the viewport with the browser
+       chrome RETRACTED, so while the address bar is showing the page is taller
+       than the screen and scrolls even though nothing overflows – which is
+       exactly what this was doing. `dvh` tracks the viewport you can actually
+       see, and shrinks again when the keyboard opens over the password field.
+       Still `min-h`, not `h`: on a short landscape phone the card genuinely is
+       taller than the screen, and clipping the Sign in button to avoid a
+       scrollbar would be the worse bug. */
+    <div className="relative flex min-h-dvh items-center justify-center bg-canvas p-4">
       {/* The theme switch moves to the page corner rather than sitting beside
           the wordmark. A control in the same row as a centred title would drag
           that title off-centre by exactly half the control's width, and the
