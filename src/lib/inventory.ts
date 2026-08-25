@@ -14,7 +14,7 @@
  * of measure on every stock screen is DAYS, with the raw count secondary.
  *
  * Velocity is measured over a trailing window of real orders. When a tea has
- * never sold, cover is `null` — not Infinity, and certainly not a large number
+ * never sold, cover is `null`  not Infinity, and certainly not a large number
  * that would look like comfort.
  * ──────────────────────────────────────────────────────────────────────────── */
 
@@ -30,7 +30,7 @@ export interface StockLine {
   key: string
   variant: VariantOps
   product: Product
-  /** Lots holding this variant, oldest first — the order to sell them in. */
+  /** Lots holding this variant, oldest first – the order to sell them in. */
   lots: Lot[]
   /** Sum of lot units. The figure the office stands behind. */
   onHand: number
@@ -66,6 +66,24 @@ export const COVER_LABEL: Record<CoverBand, string> = {
   low: 'Reorder soon',
   healthy: 'Healthy',
   unsold: 'Never sold',
+}
+
+/**
+ * The same five states, sized for a table cell.
+ *
+ * A cell that shows "50d" on one row and "Out of stock" on the next is a cell
+ * whose contents are 4 characters wide sometimes and 12 others, and right-
+ * aligning that makes the status dots wander instead of forming a line. These
+ * are all short enough to sit in one fixed track, so the column reads as a
+ * column. The full wording stays available through COVER_LABEL – on the row's
+ * tooltip and to screen readers.
+ */
+export const COVER_SHORT: Record<CoverBand, string> = {
+  out: 'None',
+  critical: 'Low',
+  low: 'Low',
+  healthy: 'OK',
+  unsold: 'Unsold',
 }
 
 export const COVER_DOT: Record<CoverBand, string> = {
@@ -149,7 +167,7 @@ export function daysUntil(iso: string, now: Date): number | null {
   return Math.floor((date.getTime() - now.getTime()) / 86_400_000)
 }
 
-/** Lots whose best-before falls inside `days` — including ones already past. */
+/** Lots whose best-before falls inside `days`  including ones already past. */
 export function expiringLots(ops: OpsStore, now: Date, days = 90): Lot[] {
   return ops.lots
     .filter((lot) => {

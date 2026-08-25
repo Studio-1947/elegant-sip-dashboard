@@ -1,12 +1,12 @@
 /* ────────────────────────────────────────────────────────────────────────────
- * Fulfilment stage — the dashboard's own field.
+ * Fulfilment stage – the dashboard's own field.
  *
  * `PlacedOrder` has no status: the storefront never had anywhere to put one.
  * Rather than write a new field into the storefront's order records (which the
  * storefront would then have to tolerate on read), the stage lives in a
  * separate dashboard key, joined by order number.
  *
- * This is a local operational note, not a shipping integration — nothing here
+ * This is a local operational note, not a shipping integration – nothing here
  * emails the customer or tells the storefront anything. The Orders page says so.
  * ──────────────────────────────────────────────────────────────────────────── */
 
@@ -62,14 +62,14 @@ export function readFulfilment(): FulfilmentStore {
   }
 }
 
-/** Orders with no recorded stage are New — that is what "just arrived" means. */
+/** Orders with no recorded stage are New – that is what "just arrived" means. */
 export const stageOf = (store: FulfilmentStore, orderNumber: string): Stage =>
   store[orderNumber]?.stage ?? 'new'
 
 /**
  * Returns whether the write actually landed. It used to return the new store
  * unconditionally, which meant a quota-exceeded or private-mode failure showed
- * a stage change on screen that no longer existed after a reload — the UI
+ * a stage change on screen that no longer existed after a reload – the UI
  * reporting a success that never happened, which is the one thing this app is
  * not allowed to do. Callers surface `ok: false` rather than a tick.
  */
@@ -83,7 +83,7 @@ export function setStage(
   return { store: ok ? next : store, ok }
 }
 
-/** The same, for a whole selection — one write, so a bulk change is atomic. */
+/** The same, for a whole selection – one write, so a bulk change is atomic. */
 export function setStages(
   store: FulfilmentStore,
   orderNumbers: string[],
@@ -96,7 +96,7 @@ export function setStages(
   return { store: ok ? next : store, ok }
 }
 
-/** Restores exactly what was there before — the undo behind the toast. */
+/** Restores exactly what was there before – the undo behind the toast. */
 export function restoreStages(
   store: FulfilmentStore,
   previous: Record<string, StageEntry | undefined>,
@@ -110,7 +110,7 @@ export function restoreStages(
   return { store: ok ? next : store, ok }
 }
 
-/** Tailwind class for a stage dot. The label always ships beside it — a stage
+/** Tailwind class for a stage dot. The label always ships beside it – a stage
     is never communicated by colour alone. */
 export const stageDotClass = (stage: Stage): string =>
   ({

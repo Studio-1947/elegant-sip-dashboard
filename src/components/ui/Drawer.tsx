@@ -6,7 +6,7 @@ import { CloseIcon } from './Icons'
  * A right-hand detail panel. On narrow screens it becomes a full-height sheet.
  *
  * The full record opens here rather than on its own route-swapped page so that
- * the list behind it keeps its filters, its sort and its scroll position — you
+ * the list behind it keeps its filters, its sort and its scroll position – you
  * can open six orders in a row and never lose your place in the table.
  *
  * This and the toast are the only two things in the app that animate: 160ms
@@ -38,16 +38,16 @@ export function Drawer({
         type="button"
         aria-label="Close panel"
         onClick={onClose}
-        className="absolute inset-0 h-full w-full animate-overlay-in cursor-default bg-ink/35"
+        className="absolute inset-0 h-full w-full animate-overlay-in cursor-default bg-scrim"
       />
       <div
         ref={ref}
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="relative flex h-full w-full max-w-2xl animate-drawer-in flex-col border-l border-line bg-canvas shadow-overlay"
+        className="relative flex h-full w-full max-w-2xl animate-drawer-in flex-col bg-canvas neu-raised-lg"
       >
-        <header className="flex items-start justify-between gap-3 border-b border-line bg-surface px-4 py-3">
+        <header className="flex items-start justify-between gap-3 border-b border-line px-4 py-3">
           <div className="min-w-0">
             <h2 className="truncate text-md font-semibold text-ink">{title}</h2>
             {subtitle && <p className="mt-0.5 truncate text-sm text-muted">{subtitle}</p>}
@@ -57,7 +57,7 @@ export function Drawer({
             onClick={onClose}
             aria-label="Close panel"
             title="Close (Esc)"
-            className="grid h-8 w-8 shrink-0 place-items-center rounded-md border border-line text-body hover:bg-sunken hover:text-ink"
+            className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-surface text-body neu-raised-sm hover:text-accent active:neu-pressed-sm"
           >
             <span className="h-3.5 w-3.5">
               <CloseIcon />
@@ -67,7 +67,7 @@ export function Drawer({
 
         <div className="flex-1 overflow-y-auto px-4 py-4">{children}</div>
 
-        {footer && <footer className="border-t border-line bg-surface px-4 py-3">{footer}</footer>}
+        {footer && <footer className="border-t border-line px-4 py-3">{footer}</footer>}
       </div>
     </div>
   )

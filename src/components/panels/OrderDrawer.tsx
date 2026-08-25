@@ -40,7 +40,7 @@ export function OrderDrawer({
       subtitle={`Placed ${formatDateTime(order.date)}`}
       footer={
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs text-muted">Stage is a local note — nothing is emailed.</p>
+          <p className="text-xs text-muted">Stage is a local note – nothing is emailed.</p>
           <div className="flex gap-2">
             <Button
               onClick={() => {
@@ -50,7 +50,7 @@ export function OrderDrawer({
                 navigator.clipboard
                   ?.writeText(address)
                   .then(() => notify('Address copied'))
-                  .catch(() => notify('Could not copy — the browser blocked clipboard access', 'error'))
+                  .catch(() => notify('Could not copy – the browser blocked clipboard access', 'error'))
               }}
             >
               Copy address
@@ -58,7 +58,7 @@ export function OrderDrawer({
             {order.email && (
               <a
                 href={`mailto:${order.email}?subject=${encodeURIComponent(`Your Elegant Sip order ${order.number}`)}`}
-                className="inline-flex h-9 items-center rounded-md border border-ink bg-ink px-4 text-sm font-semibold text-white hover:bg-ink/90"
+                className="inline-flex h-9 items-center rounded-md bg-accent px-4 text-sm font-semibold text-on-accent neu-raised-sm active:neu-pressed-sm"
               >
                 Email customer
               </a>
@@ -83,9 +83,8 @@ export function OrderDrawer({
                     updateStage(order.number, entry.id)
                     notify(`${order.number} marked ${entry.label.toLowerCase()}`)
                   }}
-                  className={`inline-flex h-9 items-center gap-2 rounded-md border px-3 text-sm font-semibold ${
-                    active ? 'border-ink bg-ink text-white' : 'border-line bg-surface text-body hover:bg-sunken'
-                  }`}
+                  className={`inline-flex h-9 items-center gap-2 rounded-md px-3 text-sm font-semibold ${active ? 'bg-sunken text-accent neu-pressed-sm' : 'bg-surface text-body neu-raised-sm hover:text-ink'
+                    }`}
                 >
                   <span className={`h-2.5 w-2.5 rounded-full ${stageDotClass(entry.id)}`} aria-hidden="true" />
                   {entry.label}
@@ -100,7 +99,7 @@ export function OrderDrawer({
 
         <section>
           <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">Items</h3>
-          <ul className="mt-2 flex flex-col divide-y divide-line rounded-lg border border-line bg-surface">
+          <ul className="mt-2 flex flex-col divide-y divide-line rounded-lg bg-surface neu-raised">
             {order.items.map((item) => (
               <li key={`${item.id}__${item.size}`} className="flex items-center gap-3 px-3 py-2">
                 {/* Led by the SKU, not a photo. Six Darjeelings are one blurred
@@ -128,7 +127,7 @@ export function OrderDrawer({
 
         <section>
           <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">Charged</h3>
-          <dl className="mt-2 flex flex-col gap-1.5 rounded-lg border border-line bg-surface p-4 text-sm">
+          <dl className="mt-2 flex flex-col gap-1.5 rounded-lg bg-surface neu-raised p-4 text-sm">
             <Row label="Goods" value={formatINR(order.subtotal)} />
             {order.discount > 0 && (
               <Row label={`Discount${order.coupon ? ` · ${order.coupon}` : ''}`} value={`−${formatINR(order.discount)}`} />
@@ -145,7 +144,7 @@ export function OrderDrawer({
           </dl>
 
           {/* Orders live in editable localStorage, so the stored total is not
-              taken on trust — it is re-derived from the line items. */}
+              taken on trust – it is re-derived from the line items. */}
           {mismatch && (
             <p className="mt-2 flex items-start gap-2 rounded-md border border-warn/35 bg-warn-soft p-3 text-xs text-ink">
               <span className="mt-0.5 h-4 w-4 shrink-0">
@@ -162,14 +161,14 @@ export function OrderDrawer({
 
         <section>
           <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">Ship to</h3>
-          <address className="mt-2 rounded-lg border border-line bg-surface p-4 text-sm not-italic text-body">
+          <address className="mt-2 rounded-lg bg-surface neu-raised p-4 text-sm not-italic text-body">
             <p className="font-semibold text-ink">{order.name || 'Name not recorded'}</p>
-            <p>{order.address || '—'}</p>
+            <p>{order.address || ''}</p>
             <p>
               {order.city}
               {order.zip ? ` ${order.zip}` : ''}
             </p>
-            <p>{order.country || '—'}</p>
+            <p>{order.country || ''}</p>
             {order.email && <p className="mt-2 break-all text-muted">{order.email}</p>}
           </address>
           {order.notes && (

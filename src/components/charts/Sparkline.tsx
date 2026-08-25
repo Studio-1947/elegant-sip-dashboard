@@ -1,8 +1,8 @@
 import { linePath } from './chartUtils'
 
 /**
- * A 12-point trend for a stat tile. Decorative in the strict sense — it carries
- * shape, not values — so it is aria-hidden and the tile's number stays the
+ * A 12-point trend for a stat tile. Decorative in the strict sense – it carries
+ * shape, not values – so it is aria-hidden and the tile's number stays the
  * accessible content.
  */
 export function Sparkline({

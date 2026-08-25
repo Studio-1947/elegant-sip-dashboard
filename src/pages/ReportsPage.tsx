@@ -15,7 +15,7 @@ import { ShareBar } from '../components/charts/ShareBar'
 import { SkeletonRows } from '../components/ui/Skeleton'
 
 /* ────────────────────────────────────────────────────────────────────────────
- * Reports — the analysis that used to crowd the Home screen, plus review
+ * Reports – the analysis that used to crowd the Home screen, plus review
  * moderation, which is reporting on the product by another name.
  *
  * Two tabs rather than two rail entries: the rail holds seven destinations and
@@ -59,18 +59,18 @@ export default function ReportsPage() {
     })),
     ...(rest.length > 0
       ? [
-          {
-            id: 'other',
-            label: `Other (${rest.length})`,
-            value: rest.reduce((sum, row) => sum + row.revenue, 0),
-            colorIndex: 5,
-          },
-        ]
+        {
+          id: 'other',
+          label: `Other (${rest.length})`,
+          value: rest.reduce((sum, row) => sum + row.revenue, 0),
+          colorIndex: 5,
+        },
+      ]
       : []),
   ]
 
   return (
-    <div className="flex flex-col gap-3 p-3">
+    <div className="flex flex-col gap-4 p-4">
       <div role="tablist" aria-label="Reports" className="flex items-center gap-1">
         {TABS.map((tab) => {
           const selected = values.tab === tab.id
@@ -80,11 +80,10 @@ export default function ReportsPage() {
               role="tab"
               aria-selected={selected}
               href={hrefFor('reports', { query: { ...route.query, tab: tab.id } })}
-              className={`inline-flex h-7 items-center rounded-sm border px-2.5 text-xs font-semibold ${
-                selected
-                  ? 'border-ink bg-ink text-white'
-                  : 'border-line bg-surface text-body hover:bg-sunken hover:text-ink'
-              }`}
+              className={`inline-flex h-8 items-center rounded-full px-3.5 text-xs font-semibold ${selected
+                  ? 'bg-sunken text-accent neu-pressed-sm'
+                  : 'bg-surface text-muted neu-raised-sm hover:text-ink'
+                }`}
             >
               {tab.label}
             </a>
@@ -111,17 +110,17 @@ export default function ReportsPage() {
             </p>
           </FilterBar>
 
-          <section aria-label="Period totals" className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+          <section aria-label="Period totals" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StatTile label="Goods revenue" value={formatINR(breakdown.goodsRevenue)} hint="Excludes shipping and GST" />
             <StatTile label="GST collected" value={formatINR(totals.tax)} hint="5% on goods and shipping" />
             <StatTile label="Discounts given" value={formatINR(totals.discount)} hint={`${formatINR(totals.shipping)} shipping charged`} />
             <StatTile label="Units sold" value={formatCount(totals.units)} hint="100 g packs" />
           </section>
 
-          <div className="grid gap-3 xl:grid-cols-2">
+          <div className="grid gap-4 xl:grid-cols-2">
             <ChartCard
               title="Best sellers"
-              subtitle="Goods revenue by tea — excludes shipping and GST"
+              subtitle="Goods revenue by tea – excludes shipping and GST"
               table={{
                 columns: ['Tea', 'Revenue', 'Units', 'Orders'],
                 rows: sold.map((row) => [

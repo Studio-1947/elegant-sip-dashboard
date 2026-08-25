@@ -14,7 +14,7 @@ export interface LegendItem {
 
 /**
  * Every chart ships with a table twin. A tooltip is an enhancement, never the
- * only route to a value — so each card carries a toggle that swaps the plot for
+ * only route to a value – so each card carries a toggle that swaps the plot for
  * the same numbers as text.
  */
 export function ChartCard({
@@ -47,7 +47,7 @@ export function ChartCard({
           onClick={() => setShowTable((current) => !current)}
           aria-pressed={showTable}
           aria-controls={regionId}
-          className="inline-flex h-8 items-center gap-1.5 rounded-lg border border-line px-2.5 text-xs font-semibold text-body hover:bg-sunken"
+          className="inline-flex h-8 items-center gap-1.5 rounded-md bg-surface px-2.5 text-xs font-semibold text-body neu-raised-sm hover:text-accent active:neu-pressed-sm"
         >
           <span className="h-3.5 w-3.5">
             <TableIcon />
@@ -56,7 +56,7 @@ export function ChartCard({
         </button>
       </div>
 
-      {/* A legend for two or more series, always — identity never rests on
+      {/* A legend for two or more series, always – identity never rests on
           colour matching alone. A single series is named by the title. */}
       {legend && legend.length > 1 && (
         <ul className="flex flex-wrap gap-x-4 gap-y-1.5 px-5 pt-3">
@@ -95,9 +95,8 @@ export function DataTable({ table }: { table: TableView }) {
               <th
                 key={column}
                 scope="col"
-                className={`border-b border-line py-2 text-xs font-semibold uppercase tracking-wider text-muted ${
-                  index === 0 ? 'text-left' : 'text-right'
-                }`}
+                className={`border-b border-line py-2 text-xs font-semibold uppercase tracking-wider text-muted ${index === 0 ? 'text-left' : 'text-right'
+                  }`}
               >
                 {column}
               </th>
@@ -110,9 +109,8 @@ export function DataTable({ table }: { table: TableView }) {
               {row.map((cell, index) => (
                 <td
                   key={index}
-                  className={`py-2 ${
-                    index === 0 ? 'pr-3 text-ink' : 'tnum text-right text-body'
-                  }`}
+                  className={`py-2 ${index === 0 ? 'pr-3 text-ink' : 'tnum text-right text-body'
+                    }`}
                 >
                   {cell}
                 </td>

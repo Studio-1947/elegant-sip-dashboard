@@ -6,14 +6,14 @@ import { Card } from '../ui/Card'
 import { AlertIcon, CheckIcon, ChevronIcon, ClockIcon } from '../ui/Icons'
 
 /* ────────────────────────────────────────────────────────────────────────────
- * The exception list — the first thing on the Home screen, above every trend.
+ * The exception list – the first thing on the Home screen, above every trend.
  *
  * The ordering is the argument. A revenue sparkline is interesting; four orders
  * that have sat unpacked since Friday are the job. Trends tell you how last week
  * went, and you cannot do anything about last week, so they go below.
  *
  * Each row is: what is true, what to do about it, and the link that lands you
- * where you can do it — pre-filtered, because "go to Orders and filter to New"
+ * where you can do it – pre-filtered, because "go to Orders and filter to New"
  * is a step this screen already knows how to take for you.
  * ──────────────────────────────────────────────────────────────────────────── */
 
@@ -88,7 +88,7 @@ export function ExceptionsPanel() {
           all-clear at all. */}
       <p className="border-t border-line px-3 py-2 text-xs text-muted">
         Not checked here: failed payments, orders on hold, pending refunds and subscription renewals.
-        This dashboard reads the storefront's browser storage, which records none of them — they need a
+        This dashboard reads the storefront's browser storage, which records none of them – they need a
         payment provider and a server before they can appear on this list.
       </p>
     </Card>

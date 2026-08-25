@@ -2,7 +2,7 @@
  * "What needs me now?"
  *
  * One derivation, two consumers: the Home screen's exception list and the
- * notification count in the top bar. They must never disagree — a bell showing
+ * notification count in the top bar. They must never disagree – a bell showing
  * 3 above a screen listing 5 destroys trust in both.
  *
  * Everything here is DERIVED. Nothing is a reminder someone typed in, and
@@ -76,9 +76,8 @@ export function exceptions({ orders, fulfilment, ops, now }: ExceptionInput): Ex
       id: 'out-of-stock',
       severity: 'critical',
       title: `${pluralise(out.length, 'SKU')} out of stock`,
-      detail: `No packs in any lot: ${out.map((line) => line.variant.sku).slice(0, 3).join(', ')}${
-        out.length > 3 ? ` and ${out.length - 3} more` : ''
-      }. The storefront will show these as sold out.`,
+      detail: `No packs in any lot: ${out.map((line) => line.variant.sku).slice(0, 3).join(', ')}${out.length > 3 ? ` and ${out.length - 3} more` : ''
+        }. The storefront will show these as sold out.`,
       count: out.length,
       route: 'catalog',
       query: { status: 'reorder' },
@@ -92,7 +91,7 @@ export function exceptions({ orders, fulfilment, ops, now }: ExceptionInput): Ex
       id: 'reorder-now',
       severity: 'critical',
       title: `${pluralise(critical.length, 'SKU')} with under two weeks of cover`,
-      detail: `A garden reorder takes longer than the cover left — ${critical
+      detail: `A garden reorder takes longer than the cover left – ${critical
         .map((line) => `${line.variant.sku} (${line.daysOfCover}d)`)
         .slice(0, 3)
         .join(', ')}. Place the order now.`,
@@ -144,7 +143,7 @@ export function exceptions({ orders, fulfilment, ops, now }: ExceptionInput): Ex
       id: 'expiring',
       severity: 'warn',
       title: `${pluralise(expiring.length, 'lot')} expiring within 90 days`,
-      detail: `${expiring.reduce((sum, lot) => sum + lot.units, 0)} packs. Sell these first — FIFO order on the Inventory screen already puts them at the top.`,
+      detail: `${expiring.reduce((sum, lot) => sum + lot.units, 0)} packs. Sell these first – FIFO order on the Inventory screen already puts them at the top.`,
       count: expiring.length,
       route: 'inventory',
       query: { window: '90' },
@@ -183,6 +182,6 @@ export function exceptions({ orders, fulfilment, ops, now }: ExceptionInput): Ex
   return list.sort((a, b) => ORDER[a.severity] - ORDER[b.severity] || b.count - a.count)
 }
 
-/** The bell counts things that need doing — informational rows are not a task. */
+/** The bell counts things that need doing – informational rows are not a task. */
 export const actionableCount = (list: Exception[]): number =>
   list.filter((entry) => entry.severity !== 'info').length

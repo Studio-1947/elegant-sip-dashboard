@@ -1,5 +1,5 @@
 /* ────────────────────────────────────────────────────────────────────────────
- * Display formatting. Money is NOT here — `formatINR` lives in the storefront
+ * Display formatting. Money is NOT here – `formatINR` lives in the storefront
  * and is imported from there, so the two apps can never disagree about what
  * ₹1,25,000 looks like.
  * ──────────────────────────────────────────────────────────────────────────── */
@@ -18,13 +18,13 @@ const timeFormatter = new Intl.DateTimeFormat('en-IN', {
   minute: '2-digit',
 })
 
-/** An unparseable ISO string is a real possibility — localStorage is editable. */
+/** An unparseable ISO string is a real possibility – localStorage is editable. */
 export function parseDate(iso: string): Date | null {
   const date = new Date(iso)
   return Number.isNaN(date.getTime()) ? null : date
 }
 
-const safe = (iso: string, formatter: Intl.DateTimeFormat, fallback = '—') => {
+const safe = (iso: string, formatter: Intl.DateTimeFormat, fallback = '') => {
   const date = parseDate(iso)
   return date ? formatter.format(date) : fallback
 }
@@ -33,7 +33,7 @@ export const formatDay = (iso: string) => safe(iso, dayFormatter)
 export const formatDate = (iso: string) => safe(iso, fullFormatter)
 export const formatDateTime = (iso: string) => safe(iso, timeFormatter)
 
-/** `2026-08-24` — the key time series are bucketed by. Local time, not UTC. */
+/** `2026-08-24`  the key time series are bucketed by. Local time, not UTC. */
 export function dayKey(date: Date): string {
   const month = `${date.getMonth() + 1}`.padStart(2, '0')
   const day = `${date.getDate()}`.padStart(2, '0')
@@ -56,14 +56,14 @@ export const formatCount = (value: number) =>
 
 /** Signed percentage for period-over-period deltas. */
 export function formatDelta(value: number): string {
-  if (!Number.isFinite(value)) return '—'
+  if (!Number.isFinite(value)) return ''
   const rounded = Math.round(value * 10) / 10
   return `${rounded > 0 ? '+' : ''}${rounded}%`
 }
 
 export function relativeDays(iso: string, now: Date): string {
   const date = parseDate(iso)
-  if (!date) return '—'
+  if (!date) return ''
   const days = Math.floor((now.getTime() - date.getTime()) / 86_400_000)
   if (days <= 0) return 'Today'
   if (days === 1) return 'Yesterday'

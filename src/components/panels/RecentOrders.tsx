@@ -55,8 +55,8 @@ export function RecentOrders({ orders }: { orders: PlacedOrder[] }) {
                     </td>
                     <td className="px-3 text-body">{formatDateTime(order.date)}</td>
                     <td className="px-3 text-body">
-                      <span className="block truncate">{order.name || '—'}</span>
-                      <span className="block truncate text-xs text-muted">{order.city || '—'}</span>
+                      <span className="block truncate">{order.name || ''}</span>
+                      <span className="block truncate text-xs text-muted">{order.city || ''}</span>
                     </td>
                     <td className="px-3 text-right text-body">{packs}</td>
                     <td className="px-3 text-right font-semibold text-ink">

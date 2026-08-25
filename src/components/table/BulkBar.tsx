@@ -7,10 +7,12 @@ import { pluralise } from '../../lib/format'
  *
  * It appears over the table rather than above it, because a toolbar that only
  * exists sometimes would otherwise push every row down the moment you tick a
- * box — and the row you are aiming at is the one that moves.
+ * box – and the row you are aiming at is the one that moves.
  *
- * It is one of the four things in this app allowed to float, so it is also one
- * of the four things allowed a shadow.
+ * It is one of the three things in this app allowed to float, so it is also one
+ * of the three allowed a shadow – with the drawer and the toast. The command
+ * palette used to be a fourth; it sits on a scrim, which does the separating
+ * job on its own, so it is a plain panel now.
  */
 export function BulkBar({
   count,
@@ -27,16 +29,16 @@ export function BulkBar({
 
   return (
     <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 flex justify-center px-4">
-      <div className="pointer-events-auto flex animate-toast-in items-center gap-2 rounded-md border border-ink bg-ink py-1.5 pl-3 pr-1.5 text-sm text-white shadow-overlay">
+      <div className="pointer-events-auto flex animate-toast-in items-center gap-2 rounded-lg bg-surface py-2 pl-3.5 pr-2 text-sm text-ink neu-raised-lg">
         <span className="font-semibold">{pluralise(count, noun)} selected</span>
-        <span className="h-4 w-px bg-white/20" aria-hidden="true" />
+        <span className="h-5 w-px bg-line-strong" aria-hidden="true" />
         {children}
         <button
           type="button"
           onClick={onClear}
           aria-label="Clear selection"
           title="Clear selection (Esc)"
-          className="grid h-7 w-7 place-items-center rounded-sm text-white/70 hover:bg-white/15 hover:text-white"
+          className="grid h-7 w-7 place-items-center rounded-full text-muted hover:text-critical active:neu-pressed-sm"
         >
           <span className="h-3.5 w-3.5">
             <CloseIcon />
@@ -61,9 +63,8 @@ export function BulkAction({
     <button
       type="button"
       onClick={onClick}
-      className={`inline-flex h-7 items-center gap-1.5 rounded-sm px-2 text-xs font-semibold ${
-        tone === 'danger' ? 'text-critical-soft hover:bg-critical/30' : 'text-white hover:bg-white/15'
-      }`}
+      className={`inline-flex h-8 items-center gap-1.5 rounded-md bg-surface px-2.5 text-xs font-semibold neu-raised-sm active:neu-pressed-sm ${tone === 'danger' ? 'text-critical' : 'text-body hover:text-accent'
+        }`}
     >
       {children}
     </button>

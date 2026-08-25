@@ -8,12 +8,12 @@
  *    keys, so it cannot leak into the customer-facing order history.
  * 2. Every record is self-identifying: order numbers start `ES-DEMO-`, and all
  *    email addresses use example.com, the RFC 2606 reserved domain.
- * 3. The money is real arithmetic — prices come from the live catalogue and
+ * 3. The money is real arithmetic – prices come from the live catalogue and
  *    totals run through the storefront's own getOrderPricing, so GST, the
  *    ₹4,000 free-shipping threshold and coupon discounts behave exactly as they
  *    would in a genuine order.
  *
- * The generator is seeded, so the same `now` always yields the same dataset —
+ * The generator is seeded, so the same `now` always yields the same dataset 
  * reloading the page must not silently redraw yesterday's revenue.
  * ──────────────────────────────────────────────────────────────────────────── */
 
@@ -29,7 +29,7 @@ export interface DemoDataset {
   subscribers: string[]
 }
 
-/** mulberry32 — small, fast, and deterministic from a fixed seed. */
+/** mulberry32  small, fast, and deterministic from a fixed seed. */
 function makeRandom(seed: number) {
   let state = seed >>> 0
   return () => {
@@ -72,20 +72,20 @@ const STREETS = [
 ]
 
 const NOTES = [
-  'Please pack the tins separately — this is a gift.',
+  'Please pack the tins separately – this is a gift.',
   'Leave with the building security if I am out.',
   'Would love a brewing card in the parcel if you have one.',
 ]
 
 const REVIEW_TEXTS = [
-  'Bright and clean in the cup — exactly the spring character I was hoping for. Brewed it a minute shorter than the card suggests and it opened up beautifully.',
+  'Bright and clean in the cup – exactly the spring character I was hoping for. Brewed it a minute shorter than the card suggests and it opened up beautifully.',
   'Arrived quickly and well sealed. The aroma when the packet opens is the best part; the second steep is nearly as good as the first.',
   'Good everyday Darjeeling. Takes a splash of milk without falling apart, which is what I wanted it for.',
-  'Delicate — you have to pay attention to the water temperature or it goes flat. Worth the care.',
+  'Delicate – you have to pay attention to the water temperature or it goes flat. Worth the care.',
   'Reordering. Nothing at this price locally comes close to it.',
 ]
 
-/** Active, purchasable variants only — a demo order for a coming-soon tea at ₹0
+/** Active, purchasable variants only – a demo order for a coming-soon tea at ₹0
     would contradict the catalogue's own rule that it cannot be bought. */
 function sellableLines() {
   return PRODUCTS.filter((product) => product.status !== 'coming-soon').flatMap((product) =>

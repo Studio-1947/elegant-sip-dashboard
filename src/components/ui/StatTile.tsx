@@ -6,7 +6,7 @@ import { formatDelta } from '../../lib/format'
 /**
  * Stat tile: label · value · optional delta · optional 12-point sparkline.
  *
- * Figures are tabular, inherited from `body` — a column of tiles whose digits
+ * Figures are tabular, inherited from `body`  a column of tiles whose digits
  * do not line up is a column you have to read twice. The value tops out at 24px
  * even for the hero: this is a dense tool, and a 36px number buys nothing that
  * a 24px number in a quiet row does not already say.
@@ -36,7 +36,7 @@ export function StatTile({
   const down = typeof delta === 'number' && delta < 0
 
   return (
-    <div className="flex flex-col justify-between rounded-lg border border-line bg-surface px-3 py-2.5">
+    <div className="flex flex-col justify-between rounded-lg bg-surface neu-raised px-3 py-2.5">
       <p className="text-xs font-semibold uppercase tracking-wider text-muted">{label}</p>
 
       <div className="mt-1.5 flex items-end justify-between gap-2">
@@ -56,9 +56,8 @@ export function StatTile({
         ) : (
           <span className="inline-flex items-center gap-1.5">
             <span
-              className={`inline-flex items-center gap-1 font-semibold ${
-                up ? 'text-good' : down ? 'text-critical' : 'text-muted'
-              }`}
+              className={`inline-flex items-center gap-1 font-semibold ${up ? 'text-good' : down ? 'text-critical' : 'text-muted'
+                }`}
             >
               {(up || down) && (
                 <span className="h-3 w-3">{up ? <ArrowUpIcon /> : <ArrowDownIcon />}</span>

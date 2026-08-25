@@ -4,7 +4,7 @@ import { ACCENT, GRID, RULE, niceTicks, useMeasuredWidth } from './chartUtils'
 export interface Column {
   label: string
   value: number
-  /** Extra line for the tooltip — e.g. revenue beside an order count. */
+  /** Extra line for the tooltip – e.g. revenue beside an order count. */
   detail?: string
 }
 
@@ -12,7 +12,7 @@ const PAD = { top: 18, right: 12, bottom: 24, left: 44 }
 const MAX_BAR = 24
 
 /** Columns capped at 24px with a 2px surface gap between neighbours, value on
-    the tallest cap only — the axis and the tooltip carry the rest. */
+    the tallest cap only – the axis and the tooltip carry the rest. */
 export function ColumnChart({
   columns,
   height = 200,
@@ -40,7 +40,7 @@ export function ColumnChart({
 
   return (
     <div ref={ref} className="relative w-full">
-      <svg width={width} height={height} role="img" aria-label={`${seriesLabel} — ${columns.length} columns. Switch to the table view for every value.`} className="block">
+      <svg width={width} height={height} role="img" aria-label={`${seriesLabel}  ${columns.length} columns. Switch to the table view for every value.`} className="block">
         {ticks.map((tick) => (
           <g key={tick}>
             <line x1={PAD.left} x2={PAD.left + plotWidth} y1={yFor(tick)} y2={yFor(tick)} stroke={tick === 0 ? RULE : GRID} strokeWidth={1} />
@@ -86,7 +86,7 @@ export function ColumnChart({
 
       {active !== null && columns[active] && (
         <div
-          className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg border border-line bg-surface px-3 py-2 text-xs shadow-overlay"
+          className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-md bg-surface px-3 py-2 text-xs neu-raised"
           style={{ left: Math.min(Math.max(centreOf(active), 60), width - 60), top: yFor(columns[active].value) - 6 }}
         >
           <p className="font-semibold text-ink">{columns[active].label}</p>

@@ -3,7 +3,7 @@ import { formatINR } from '@storefront/lib/currency'
 import { useDataset } from '../lib/datasetContext'
 import { RANGES, filterByRange, type RangeId } from '../lib/metrics'
 import { productBreakdown } from '../lib/analysis'
-import { stockLines, coverBand, COVER_DOT, COVER_LABEL } from '../lib/inventory'
+import { stockLines, coverBand, COVER_DOT, COVER_LABEL, COVER_SHORT } from '../lib/inventory'
 import { TEA_TYPES, type TeaType } from '../lib/ops'
 import { navigate, useQueryState, useRoute } from '../lib/router'
 import { formatCount, pluralise } from '../lib/format'
@@ -22,7 +22,7 @@ import { ProductDrawer } from '../components/panels/ProductDrawer'
  *
  * The previous version of this screen was a grid of cards led by a 52px photo.
  * Six Darjeelings photograph identically at that size, so the picture was doing
- * no identifying work at all — it just looked like a shop. Rows are led by the
+ * no identifying work at all – it just looked like a shop. Rows are led by the
  * SKU and the tea type instead, which are the two things that actually tell you
  * which product you are looking at.
  *
@@ -104,7 +104,7 @@ export default function CatalogPage({ focusProduct }: { focusProduct?: string })
   const editWholesale = (key: string, sku: string, next: string) => {
     const previous = ops.variants[key]?.wholesalePrice ?? 0
     if (!updateVariantOps(key, { wholesalePrice: Number(next) })) {
-      notify('Storage refused the write — the price is unchanged', 'error')
+      notify('Storage refused the write – the price is unchanged', 'error')
       return
     }
     notify(`${sku} trade price set to ${formatINR(Number(next))}`, {
@@ -118,7 +118,7 @@ export default function CatalogPage({ focusProduct }: { focusProduct?: string })
   const editMoq = (key: string, sku: string, next: string) => {
     const previous = ops.variants[key]?.moq ?? 1
     if (!updateVariantOps(key, { moq: Number(next) })) {
-      notify('Storage refused the write — the minimum is unchanged', 'error')
+      notify('Storage refused the write – the minimum is unchanged', 'error')
       return
     }
     notify(`${sku} minimum set to ${next}`, {
@@ -165,12 +165,12 @@ export default function CatalogPage({ focusProduct }: { focusProduct?: string })
       header: 'Retail',
       align: 'right',
       width: 104,
-      headerTitle: 'Set in the storefront catalogue — read-only here',
+      headerTitle: 'Set in the storefront catalogue – read-only here',
       render: (row) =>
         row.line.retailPrice > 0 ? (
           <span className="text-ink">{formatINR(row.line.retailPrice)}</span>
         ) : (
-          <span className="text-muted">—</span>
+          <span className="text-muted"></span>
         ),
     },
     {
@@ -210,12 +210,21 @@ export default function CatalogPage({ focusProduct }: { focusProduct?: string })
       header: 'Stock',
       align: 'right',
       width: 152,
+      /* Three FIXED tracks, not a right-aligned flex row. Flex sized each part
+         to its own content, so a "150d" row and an "Out of stock" row pushed
+         their dots to different x positions and the column lost its spine.
+         Fixed tracks mean the dots line up, the pack counts line up, and the
+         cover figures line up, whatever is in them. */
       render: (row) => (
-        <span className="inline-flex items-center justify-end gap-1.5">
-          <span className={`h-2 w-2 shrink-0 rounded-full ${COVER_DOT[row.band]}`} aria-hidden="true" />
-          <span className="text-ink">{formatCount(row.line.onHand)}</span>
-          <span className="text-xs text-muted">
-            {row.line.daysOfCover === null ? COVER_LABEL[row.band] : `${row.line.daysOfCover}d`}
+        <span
+          className="inline-grid grid-cols-[0.5rem_2.75rem_3.25rem] items-center gap-2"
+          title={`${formatCount(row.line.onHand)} packs – ${COVER_LABEL[row.band]}`}
+        >
+          <span className={`h-2 w-2 rounded-full ${COVER_DOT[row.band]}`} aria-hidden="true" />
+          <span className="text-right text-ink">{formatCount(row.line.onHand)}</span>
+          <span className="text-right text-xs text-muted">
+            {row.line.daysOfCover === null ? COVER_SHORT[row.band] : `${row.line.daysOfCover}d`}
+            <span className="sr-only"> – {COVER_LABEL[row.band]}</span>
           </span>
         </span>
       ),
@@ -249,7 +258,7 @@ export default function CatalogPage({ focusProduct }: { focusProduct?: string })
   ].filter(Boolean) as { field: string; value: string; key: 'type' | 'status' | 'range' | 'q' }[]
 
   return (
-    <div className="flex flex-col gap-3 p-3">
+    <div className="flex flex-col gap-4 p-4">
       <SavedViews route="catalog" views={VIEWS} current={route.query} />
 
       <FilterBar>
@@ -307,7 +316,7 @@ export default function CatalogPage({ focusProduct }: { focusProduct?: string })
 
       <p className="text-xs text-muted">
         Retail price and product status come from the storefront's{' '}
-        <code className="rounded-sm bg-sunken px-1">data/products.ts</code> and are read-only here — they
+        <code className="rounded-sm bg-sunken px-1">data/products.ts</code> and are read-only here – they
         change with a build, not from this screen. Trade price, MOQ, weight and tea type are recorded by
         this dashboard.
       </p>

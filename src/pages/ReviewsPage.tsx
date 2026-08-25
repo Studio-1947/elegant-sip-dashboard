@@ -67,8 +67,8 @@ export default function ReviewsPage() {
         />
         <StatTile
           label="Average rating"
-          value={all.length === 0 ? '—' : `${average.toFixed(1)} / 5`}
-          hint={all.length === 0 ? 'No reviews yet — no star rating is shown anywhere' : undefined}
+          value={all.length === 0 ? '' : `${average.toFixed(1)} / 5`}
+          hint={all.length === 0 ? 'No reviews yet – no star rating is shown anywhere' : undefined}
         />
         <StatTile
           label="Verified purchases"
@@ -98,7 +98,7 @@ export default function ReviewsPage() {
           title="All reviews"
           subtitle={
             mode === 'demo'
-              ? 'Demo reviews — deleting one affects the demo dataset only.'
+              ? 'Demo reviews – deleting one affects the demo dataset only.'
               : 'Deleting a review removes it from the storefront product page on this browser.'
           }
         />
@@ -137,7 +137,7 @@ export default function ReviewsPage() {
                           (entry) => entry.id === row.review.id,
                         )
                         if (!deleteReview(row.productId, row.review.id)) {
-                          notify('Could not write to storage — the review is still there', 'error')
+                          notify('Could not write to storage – the review is still there', 'error')
                           return
                         }
                         notify(`Review by ${row.review.author} deleted`, {
@@ -145,7 +145,7 @@ export default function ReviewsPage() {
                             label: 'Undo',
                             onClick: () => {
                               if (!restoreReview(row.productId, row.review, index)) {
-                                notify('Could not write to storage — the review is still deleted', 'error')
+                                notify('Could not write to storage – the review is still deleted', 'error')
                               }
                             },
                           },
@@ -168,7 +168,7 @@ export default function ReviewsPage() {
 
       <p className="text-xs text-muted">
         Reviews live in this browser's localStorage, so this list is what a visitor on this device
-        would see — not every review ever written. A shared review store needs the first API.
+        would see – not every review ever written. A shared review store needs the first API.
       </p>
     </div>
   )

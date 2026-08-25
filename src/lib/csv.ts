@@ -1,7 +1,7 @@
 /* CSV export. Excel is the reporting tool most small brands actually have, so
    every table in this app can leave as a file. */
 
-/** RFC 4180 quoting — a tea name containing a comma must not split a column. */
+/** RFC 4180 quoting – a tea name containing a comma must not split a column. */
 function escapeCell(value: string | number): string {
   const text = String(value ?? '')
   return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text

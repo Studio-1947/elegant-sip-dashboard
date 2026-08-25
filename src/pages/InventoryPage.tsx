@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useDataset } from '../lib/datasetContext'
-import { daysUntil, stockLines, coverBand, COVER_DOT, COVER_LABEL } from '../lib/inventory'
+import { daysUntil, stockLines, coverBand, COVER_DOT, COVER_LABEL, COVER_SHORT } from '../lib/inventory'
 import type { Lot } from '../lib/ops'
 import { useQueryState, useRoute } from '../lib/router'
 import { formatDate, formatCount, pluralise } from '../lib/format'
@@ -25,14 +25,14 @@ import { useToast } from '../components/ui/Toast'
  * way to sell them is oldest first. Roll them into one number and you cannot see
  * the write-off coming.
  *
- * So the row here is a lot — code, garden, harvest, arrival, best-before — and
+ * So the row here is a lot – code, garden, harvest, arrival, best-before – and
  * the default sort is FIFO, because that is the order the shelf should empty in.
  * ──────────────────────────────────────────────────────────────────────────── */
 
 type SortId = 'fifo' | 'expiry' | 'units' | 'sku'
 
 const SORTS: { id: SortId; label: string }[] = [
-  { id: 'fifo', label: 'FIFO — oldest first' },
+  { id: 'fifo', label: 'FIFO – oldest first' },
   { id: 'expiry', label: 'Expiring soonest' },
   { id: 'units', label: 'Fewest units' },
   { id: 'sku', label: 'SKU' },
@@ -105,7 +105,7 @@ export default function InventoryPage() {
   const editUnits = (lot: Lot, sku: string, next: string) => {
     const previous = lot.units
     if (!updateLot(lot.id, { units: Number(next) })) {
-      notify('Storage refused the write — the lot is unchanged', 'error')
+      notify('Storage refused the write – the lot is unchanged', 'error')
       return
     }
     notify(`${lot.code} (${sku}) set to ${next} packs`, {
@@ -118,7 +118,7 @@ export default function InventoryPage() {
     const ok = ids.every((id) => updateLot(id, { units: 0 }))
     setSelected(new Set())
     if (!ok) {
-      notify('Storage refused the write — nothing was written off', 'error')
+      notify('Storage refused the write – nothing was written off', 'error')
       return
     }
     notify(`${pluralise(ids.length, 'lot')} written off`, {
@@ -184,7 +184,7 @@ export default function InventoryPage() {
       id: 'received',
       header: 'Received',
       width: 116,
-      headerTitle: 'Arrival date — FIFO order is this, ascending',
+      headerTitle: 'Arrival date – FIFO order is this, ascending',
       render: (row) => <span className="text-body">{formatDate(row.lot.receivedAt)}</span>,
     },
     {
@@ -228,10 +228,14 @@ export default function InventoryPage() {
       render: (row) => {
         const band = coverBand(row.line)
         return (
-          <span className="inline-flex items-center justify-end gap-1.5">
-            <span className={`h-2 w-2 shrink-0 rounded-full ${COVER_DOT[band]}`} aria-hidden="true" />
-            <span className="text-body">
-              {row.line.daysOfCover === null ? COVER_LABEL[band] : `${row.line.daysOfCover} days`}
+          <span
+            className="inline-grid grid-cols-[0.5rem_4.5rem] items-center gap-2"
+            title={COVER_LABEL[band]}
+          >
+            <span className={`h-2 w-2 rounded-full ${COVER_DOT[band]}`} aria-hidden="true" />
+            <span className="text-right text-body">
+              {row.line.daysOfCover === null ? COVER_SHORT[band] : `${row.line.daysOfCover} days`}
+              <span className="sr-only"> – {COVER_LABEL[band]}</span>
             </span>
           </span>
         )
@@ -250,8 +254,8 @@ export default function InventoryPage() {
   ].filter(Boolean) as { field: string; value: string; key: 'garden' | 'window' | 'q' }[]
 
   return (
-    <div className="flex flex-col gap-3 p-3">
-      <section aria-label="Stock at a glance" className="grid gap-2 sm:grid-cols-3">
+    <div className="flex flex-col gap-4 p-4">
+      <section aria-label="Stock at a glance" className="grid gap-4 sm:grid-cols-3">
         <StatTile label="Packs held" value={formatCount(summary.held)} hint={`Across ${pluralise(ops.lots.length, 'lot')}`} />
         <StatTile
           label="Expiring within 90 days"
@@ -332,7 +336,7 @@ export default function InventoryPage() {
       </Card>
 
       <p className="text-xs text-muted">
-        Lots are recorded by this dashboard, not by the storefront — see Settings. They were derived from
+        Lots are recorded by this dashboard, not by the storefront – see Settings. They were derived from
         the catalogue's own stock figures, so the packs held for a SKU always sum to what the shop
         publishes until you edit them here.
       </p>

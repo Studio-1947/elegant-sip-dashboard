@@ -2,7 +2,7 @@
  * The one place that decides what "the data" is.
  *
  * Live mode reads the storefront's own localStorage keys. That only sees real
- * orders when the two apps share an origin — a browser keeps storage per
+ * orders when the two apps share an origin – a browser keeps storage per
  * scheme+host+port, so the dashboard on http://localhost/Elegantsip-dashboard/
  * reads the same storage as the shop on http://localhost/Elegantsip/, while the
  * two Vite dev servers on different ports each have their own. The Data page
@@ -51,7 +51,7 @@ interface Snapshot {
   reviews: ReviewStore
   subscribers: string[]
   rejected: { orders: number; reviews: number; subscribers: number }
-  /** Live-only signals — the signed-in demo account and its open cart. */
+  /** Live-only signals – the signed-in demo account and its open cart. */
   user: { name: string; email: string } | null
   cartLines: number
   wishlist: string[]
@@ -67,7 +67,7 @@ interface DatasetValue extends Snapshot {
   seedDemo: () => boolean
   clearDemo: () => void
   fulfilment: FulfilmentStore
-  /** All of these report whether the write landed — never assume it did. */
+  /** All of these report whether the write landed – never assume it did. */
   updateStage: (orderNumber: string, stage: Stage) => boolean
   updateStages: (orderNumbers: string[], stage: Stage) => boolean
   /** Puts back exactly what a bulk change replaced. Powers the undo toast. */
@@ -98,15 +98,15 @@ function readSnapshot(mode: DataMode): Snapshot {
   const keys =
     mode === 'demo'
       ? {
-          orders: DASHBOARD_KEYS.demoOrders,
-          reviews: DASHBOARD_KEYS.demoReviews,
-          subscribers: DASHBOARD_KEYS.demoSubscribers,
-        }
+        orders: DASHBOARD_KEYS.demoOrders,
+        reviews: DASHBOARD_KEYS.demoReviews,
+        subscribers: DASHBOARD_KEYS.demoSubscribers,
+      }
       : {
-          orders: STOREFRONT_KEYS.orders,
-          reviews: STOREFRONT_KEYS.reviews,
-          subscribers: STOREFRONT_KEYS.subscribers,
-        }
+        orders: STOREFRONT_KEYS.orders,
+        reviews: STOREFRONT_KEYS.reviews,
+        subscribers: STOREFRONT_KEYS.subscribers,
+      }
 
   const orders = readOrders(keys.orders)
   const reviews = readReviews(keys.reviews)
@@ -158,7 +158,7 @@ export function DatasetProvider({ children }: { children: ReactNode }) {
     setSnapshot(readSnapshot(next))
   }, [])
 
-  // A checkout completed in another tab fires `storage` here — so placing a
+  // A checkout completed in another tab fires `storage` here – so placing a
   // demo order on the storefront updates the dashboard without a manual reload.
   useEffect(() => {
     const onStorage = (event: StorageEvent) => {
@@ -293,7 +293,7 @@ export function DatasetProvider({ children }: { children: ReactNode }) {
   )
 
   /* The other half of the review delete. Because this can put a review back
-     exactly where it was, deleting one does not need a confirmation step — it
+     exactly where it was, deleting one does not need a confirmation step – it
      needs an undo, which is faster in the common case and safer in the rare
      one. The index is carried so a restore does not silently reorder the list. */
   const restoreReview = useCallback(

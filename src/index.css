@@ -1,51 +1,263 @@
 @import 'tailwindcss';
 
 /* ────────────────────────────────────────────────────────────────────────────
- * Elegant Sip — operations dashboard: the design system.
+ * Elegant Sip  operations dashboard: the design system.
  *
- * This is an internal tool used eight hours a day, not the storefront. The
- * governing tone is utility over romance: precise, calm, dense. The storefront's
- * dark green is deliberately NOT carried across — brand appears as an accent
- * only, and green is reserved for one thing (a "good" status) so it can never be
- * read as decoration.
+ * NEUMORPHIC, in two themes. Surfaces are not drawn with borders and fills;
+ * they are extruded out of the background with a pair of shadows  a light one
+ * from the top-left and a dark one from the bottom-right. The single rule that
+ * makes it work is that an element and the surface behind it are the SAME
+ * colour. A white card on a grey page is a card; a grey card on the same grey
+ * page is a shape pressed out of it.
  *
- * Four rules this file enforces, so components cannot break them by accident:
+ * Three consequences the components below are built around:
  *
- * 1. ONE type scale — 12/13/14/16/20/24. The `--text-*` namespace is cleared
- *    first, so `text-2xl` and friends simply do not exist any more.
- * 2. ONE palette — a warm neutral ramp plus a single copper accent. The
- *    `--color-*` namespace is cleared first, so Tailwind's default 22-hue
- *    palette is gone: `bg-blue-500` is not a class in this app.
- * 3. Green / amber / red / blue are STATUS ONLY, never decoration, and every
- *    status colour ships beside an icon or a text label (see Card's DotLabel).
- * 4. Near-flat — one border colour, one shadow, radii capped at 6px.
+ * 1. `--color-surface` EQUALS `--color-canvas`. Deliberately. If you find
+ *    yourself wanting a lighter card, you want a shadow, not a fill.
+ * 2. State is depth, not colour. Resting is raised, active/selected is PRESSED
+ *    (inset). That is why the rail's current item looks pushed into the page.
+ * 3. Borders nearly vanish. `--color-line` survives only where shadow cannot do
+ *    the job  separating table rows, which cannot each be extruded without the
+ *    whole table turning to porridge.
+ *
+ * Neumorphism's known failure is contrast: soft shadows tempt you into soft
+ * text. Every text token here is checked against its own theme's canvas, and
+ * the numbers are in the comments.
+ *
+ * What survives from the previous system, unchanged:
+ *   - ONE type scale, 12/13/14/16/20/24. The `--text-*` namespace is cleared
+ *     first, so `text-2xl` is not a class in this app.
+ *   - ONE accent, teal. Green / amber / red are STATUS ONLY, never decoration,
+ *     and never used without an icon or a text label beside them. Blue was
+ *     reserved once, as `--info`; nothing used it and it is gone.
+ *     Teal sits near green, so `--good` was pushed toward yellow to keep the
+ *     two apart at 8px  see the note on it below.
+ *   - The `--color-*` namespace is cleared first, so Tailwind's default 22-hue
+ *     palette is gone: `bg-blue-500` is not a class either.
  * ──────────────────────────────────────────────────────────────────────────── */
 
+/* ── Theme values ───────────────────────────────────────────────────────────
+   Raw values live here rather than in `@theme` so they can be re-pointed per
+   theme at runtime. `@theme` below maps them into Tailwind's namespaces once,
+   and every utility resolves through them. */
+
+:root {
+  color-scheme: light;
+
+  /* The neumorphic base. A near-white lavender grey: it has to be light enough
+     to read dark text on, and dark enough that a white highlight registers. */
+  --canvas: #e8eaf3;
+  --sunken: #e1e3ee;
+  --hi: #ffffff;
+  /* top-left highlight */
+  --lo: #b8bccc;
+  /* bottom-right shade */
+  --line: rgb(120 128 156 / 0.16);
+  --line-strong: rgb(120 128 156 / 0.28);
+
+  /* Text. Measured contrast against --canvas:
+     ink 12.6:1 · body 6.7:1 · muted 4.5:1 · faint is NON-TEXT only (2.5:1). */
+  --ink: #22262f;
+  --body: #4a5162;
+  --muted: #636980;
+  --faint: #8d93a5;
+
+  /* ONE accent: teal. 5.1:1 on canvas.
+     Deeper than the reference gradient, and it has to be: the accent is
+     overwhelmingly TEXT  26 `text-accent` usages against 5 fills  and a bright
+     teal on a near-white canvas cannot clear 4.5:1. Hue stays at ~178°, so it
+     still reads teal rather than bottle green. The dark theme gets the bright
+     end of the gradient, where it can afford to. */
+  --accent: #0d6e6a;
+  --accent-strong: #0a5754;
+  --accent-soft: rgb(13 110 106 / 0.12);
+  --accent-line: rgb(13 110 106 / 0.28);
+  /* Text sitting ON an accent fill. Its own token rather than `--canvas`,
+     because the two only coincided by luck: the readable colour on a filled
+     swatch is a function of the FILL, not of the page behind it. 5.1:1 here. */
+  --on-accent: #e8eaf3;
+
+  /* Status  reserved. On canvas: good 4.9 · warn 5.3 · critical 5.8.
+     `--good` is a YELLOW-green (~96°), not the blue-green it used to be. That is
+     the price of a teal accent: at 8px, a teal dot and a blue-green dot are the
+     same dot, and the one place that matters most is a status marker beside an
+     accent-coloured link. Pushing green toward yellow buys ~80° of separation. */
+  --good: #38700f;
+  --good-soft: rgb(56 112 15 / 0.12);
+  --warn: #7d5a08;
+  --warn-soft: rgb(125 90 8 / 0.14);
+  --critical: #ab241c;
+  --critical-soft: rgb(171 36 28 / 0.12);
+
+  /* Fulfilment stages. Ordinal, and a status hue only where the stage genuinely
+     IS that status: "new" wears the accent because it wants a human, the middle
+     stages are neutral progress, and only the terminal states earn green and
+     red. The label always ships alongside. */
+  --stage-new: #0d6e6a;
+  --stage-packed: #a3a9bb;
+  --stage-shipped: #636980;
+  --stage-delivered: #38700f;
+  --stage-cancelled: #ab241c;
+
+  /* Share-of-total slots: an ACCENT ramp, not six hues  the status hues are
+     spoken for and the system allows one accent. Separation is LIGHTNESS, so the
+     slots survive greyscale and every form of colour blindness. Each carries its
+     own label colour, because the ramp crosses over and the crossover point
+     moves between themes. */
+  --share-1: #06403e;
+  --share-2: #0d6e6a;
+  --share-3: #10817c;
+  --share-4: #4fb3ad;
+  --share-5: #9fd9d4;
+  --share-6: #b9bdcb;
+  --share-on-1: #ffffff;
+  --share-on-2: #ffffff;
+  --share-on-3: #ffffff;
+  --share-on-4: #22262f;
+  --share-on-5: #22262f;
+  --share-on-6: #22262f;
+
+  /* Tea liquor. NOT a palette slot and not the accent  these are the colour
+     the tea actually brews, running dark-to-pale with oxidation, and they used
+     to be borrowed from the share ramp. Once the accent went blue that borrowing
+     produced a blue swatch for black tea, so they are their own tokens now.
+     Representational, always paired with the type's name, never a status. */
+  --liquor-black: #4f2810;
+  --liquor-chai: #7c421e;
+  --liquor-oolong: #a76435;
+  --liquor-herbal: #c99163;
+  --liquor-green: #e5c6a6;
+  --liquor-white: #ded9d0;
+
+  --grid: rgb(120 128 156 / 0.18);
+  --rule: rgb(120 128 156 / 0.32);
+
+  /* The brand gradient, off the reference swatch. Theme-independent: it is the
+     mark, not a surface, and it appears in exactly one place - the filled half
+     of the theme switch. Anywhere else it would be decoration, which this app
+     does not spend. */
+  --accent-gradient: linear-gradient(105deg, #0e7f74 0%, #1a9e8a 45%, #45c8c0 100%);
+  /* The switch knob in its ON position. Always the dark theme's own colour,
+     because that is what it is a picture OF. */
+  --knob-on: linear-gradient(145deg, #464c58 0%, #2b303a 100%);
+  --shadow-knob: 0 3px 8px rgb(8 9 12 / 0.42), 0 1px 2px rgb(8 9 12 / 0.30);
+
+  /* The wash behind a modal. Always dark, in both themes  it is shade, not a
+     surface, and `--ink` inverts while shade does not. */
+  --scrim: rgb(20 22 28 / 0.42);
+}
+
+/* Dark. `data-theme` is written by initTheme() before the first paint and is
+   always present, so there is no media query here and nothing to disagree with:
+   the toggle is the only thing that changes the theme. */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --canvas: #2a2e35;
+  --sunken: #262a31;
+  --hi: #363c46;
+  /* on dark, the "light" is a lift, not white */
+  --lo: #1c1f24;
+  --line: rgb(255 255 255 / 0.07);
+  --line-strong: rgb(255 255 255 / 0.14);
+
+  /* Measured contrast against --canvas:
+     ink 11.5:1 · body 7.9:1 · muted 5.0:1 · faint is NON-TEXT only (3.1:1).
+     Status: good 5.9 · warn 6.2 · critical 4.6 · info 5.3. */
+  --ink: #eef0f5;
+  --body: #c4c9d4;
+  --muted: #9aa1af;
+  --faint: #737b8a;
+
+  /* 6.4:1 on canvas  the bright end of the reference gradient, which a dark
+     ground can carry and a light one cannot. The accent inverts across themes,
+     so the hover step brightens here where the light theme's darkens.
+     Anything FILLED with this takes `text-canvas`, never `text-white`: white on
+     it is 2.0:1, the canvas colour holds the same 6.4:1. */
+  --accent: #45c8c0;
+  --accent-strong: #6fdad3;
+  /* 7.9:1  hover lifts further out of the dark */
+  --accent-soft: rgb(69 200 192 / 0.16);
+  --accent-line: rgb(69 200 192 / 0.32);
+  /* Deliberately NOT `--canvas` (#2a2e35). A touch darker sits better on the
+     bright teal and buys contrast with it: 7.4:1, against 6.4:1 for canvas. */
+  --on-accent: #22262f;
+
+  /* Yellow-green here too, for the same 8px reason. */
+  --good: #7cc93f;
+  --good-soft: rgb(124 201 63 / 0.16);
+  --warn: #e0a93f;
+  --warn-soft: rgb(224 169 63 / 0.16);
+  --critical: #f0736a;
+  --critical-soft: rgb(240 115 106 / 0.16);
+
+  --stage-new: #45c8c0;
+  --stage-packed: #6d7482;
+  --stage-shipped: #9aa1af;
+  --stage-delivered: #7cc93f;
+  --stage-cancelled: #f0736a;
+
+  /* The ramp inverts: on a dark ground the pale end is the one that shows, and
+     the dark end would sink into the canvas. So all six sit in the readable
+     half and every slot takes ink  separation is still lightness, just over a
+     narrower band. */
+  --share-1: #dff5f2;
+  --share-2: #b8e8e4;
+  --share-3: #91dad4;
+  --share-4: #6accc5;
+  --share-5: #45beb6;
+  --share-6: #9aa1af;
+  --share-on-1: #22262f;
+  --share-on-2: #22262f;
+  --share-on-3: #22262f;
+  --share-on-4: #22262f;
+  --share-on-5: #22262f;
+  --share-on-6: #22262f;
+
+  /* Liquor lifts too  a black tea is still the darkest, but #4f2810 on this
+     canvas is a hole rather than a swatch. */
+  --liquor-black: #6b3a18;
+  --liquor-chai: #8f5227;
+  --liquor-oolong: #b3763f;
+  --liquor-herbal: #d0a074;
+  --liquor-green: #ecd0b0;
+  --liquor-white: #e8e2d8;
+
+  --grid: rgb(255 255 255 / 0.09);
+  --rule: rgb(255 255 255 / 0.18);
+  --scrim: rgb(8 9 12 / 0.62);
+}
+
 @theme {
-  /* ── Type ─────────────────────────────────────────────────────────────────
-     Inter, loaded in index.html with a system fallback that keeps the same
-     metrics-ish rhythm if the network is unavailable (this app is often opened
-     from a local XAMPP root with no internet). */
-  --font-sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* ── Type ───────────────────────────────────────────────────────────────── */
+  /* Google Sans, with a deep fallback for the two cases that actually happen:
+     no network (XAMPP, offline) and the endpoint changing under us - it is not
+     a catalogued family, so it carries more delivery risk than Inter did.
+     Inter sits second because it is metrically closest of the fallbacks. */
+  --font-sans: 'Google Sans', 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-mono: ui-monospace, 'Cascadia Mono', Consolas, monospace;
 
-  /* Six steps, and only six. Body text is 13–14px. */
   --text-*: initial;
-  --text-xs: 0.75rem; /* 12 — table headers, meta, chips */
+  --text-xs: 0.75rem;
+  /* 12  table headers, meta, chips */
   --text-xs--line-height: 1rem;
-  --text-sm: 0.8125rem; /* 13 — dense table body */
+  --text-sm: 0.8125rem;
+  /* 13  dense table body */
   --text-sm--line-height: 1.125rem;
-  --text-base: 0.875rem; /* 14 — default body */
+  --text-base: 0.875rem;
+  /* 14  default body */
   --text-base--line-height: 1.25rem;
-  --text-md: 1rem; /* 16 — drawer titles, section leads */
+  --text-md: 1rem;
+  /* 16  drawer titles, section leads */
   --text-md--line-height: 1.5rem;
-  --text-lg: 1.25rem; /* 20 — page title, stat values */
+  --text-lg: 1.25rem;
+  /* 20  page title, stat values */
   --text-lg--line-height: 1.75rem;
-  --text-xl: 1.5rem; /* 24 — the single largest figure on a screen */
+  --text-xl: 1.5rem;
+  /* 24  the single largest figure on a screen */
   --text-xl--line-height: 2rem;
 
-  /* ── Colour ───────────────────────────────────────────────────────────────
-     Cleared first: everything below is the entire palette of this app. */
+  /* ── Colour ─────────────────────────────────────────────────────────────── */
   --color-*: initial;
   --color-white: #ffffff;
   --color-black: #000000;
@@ -53,104 +265,132 @@
   --color-current: currentColor;
   --color-inherit: inherit;
 
-  /* Warm neutral ramp, ten steps. Contrast on white:
-     n-500 3.5:1 (NON-TEXT only — icons, disabled, placeholder),
-     n-600 5.8:1, n-700 8.8:1, n-900 16.2:1. */
-  --color-n-50: #faf9f8;
-  --color-n-100: #f2f0ed;
-  --color-n-200: #e6e2dd;
-  --color-n-300: #d5d0c9;
-  --color-n-400: #b3aca3;
-  --color-n-500: #8e8880;
-  --color-n-600: #6b655e;
-  --color-n-700: #4f4a45;
-  --color-n-800: #3a352f;
-  --color-n-900: #23201d;
+  /* Surface and canvas are the same value. That is the whole trick. */
+  --color-canvas: var(--canvas);
+  --color-surface: var(--canvas);
+  --color-sunken: var(--sunken);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
 
-  /* Semantic surfaces and text. Components use these, not the raw ramp. */
-  --color-canvas: #faf9f8;
-  --color-surface: #ffffff;
-  --color-sunken: #f2f0ed;
-  --color-line: #e6e2dd; /* THE border. One style, one weight, one colour. */
-  --color-line-strong: #d5d0c9; /* Structural only: table rules, dividers. */
-  --color-ink: #23201d; /* Primary text */
-  --color-body: #4f4a45; /* Secondary text */
-  --color-muted: #6b655e; /* Tertiary text — still 5.8:1 */
-  --color-faint: #8e8880; /* NEVER text: icons, placeholders, disabled */
+  --color-ink: var(--ink);
+  --color-body: var(--body);
+  --color-muted: var(--muted);
+  --color-faint: var(--faint);
 
-  /* The dark rail. Its own three tokens so the chrome cannot drift. */
-  --color-rail: #23201d;
-  --color-rail-text: #f2f0ed;
-  --color-rail-muted: #b3aca3;
+  /* The rail is not a dark slab any more  it is the same surface, extruded. */
+  --color-rail: var(--canvas);
+  --color-rail-text: var(--ink);
+  --color-rail-muted: var(--muted);
 
-  /* ONE accent: copper. 5.6:1 on white, 5.3:1 on canvas. */
-  --color-accent: #9a5528;
-  --color-accent-strong: #7c421e; /* hover / pressed */
-  --color-accent-soft: #f7ede5; /* tint fill — 4.9:1 under accent text */
-  --color-accent-line: #e6cdb8;
-  --color-accent-on-rail: #d9915c; /* 6.3:1 on --color-rail */
+  --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-line: var(--accent-line);
+  --color-on-accent: var(--on-accent);
+  --color-accent-on-rail: var(--accent);
 
-  /* ── Status — reserved. Never decoration, never a series colour, and never
-     used without an icon or a text label beside it. All ≥ 4.9:1 on white. */
-  --color-good: #1f7a34;
-  --color-good-soft: #e8f4ea;
-  --color-warn: #85600a;
-  --color-warn-soft: #fbf1dc;
-  --color-critical: #b3261e;
-  --color-critical-soft: #fbe9e7;
-  --color-info: #1d5fb4;
-  --color-info-soft: #e8f0fb;
+  --color-good: var(--good);
+  --color-good-soft: var(--good-soft);
+  --color-warn: var(--warn);
+  --color-warn-soft: var(--warn-soft);
+  --color-critical: var(--critical);
+  --color-critical-soft: var(--critical-soft);
 
-  /* Fulfilment stages. Ordinal, and it uses a status hue only where the stage
-     genuinely IS that status: "new" wears the accent because it wants a human,
-     the two middle stages are neutral progress, and only the terminal states
-     earn green and red. The label always ships alongside. */
-  --color-stage-new: #9a5528;
-  --color-stage-packed: #b3aca3;
-  --color-stage-shipped: #6b655e;
-  --color-stage-delivered: #1f7a34;
-  --color-stage-cancelled: #b3261e;
+  --color-stage-new: var(--stage-new);
+  --color-stage-packed: var(--stage-packed);
+  --color-stage-shipped: var(--stage-shipped);
+  --color-stage-delivered: var(--stage-delivered);
+  --color-stage-cancelled: var(--stage-cancelled);
 
-  /* Share-of-total slots. A copper ramp, not six hues: the spec allows one
-     accent, and the four status hues are spoken for. Separation here is
-     LIGHTNESS, so slots stay distinguishable in greyscale and under every form
-     of colour blindness. Slots 1–3 carry white text, 4–6 carry ink — ShareBar
-     picks by index. */
-  --color-share-1: #4a2410;
-  --color-share-2: #7c421e;
-  --color-share-3: #9d6033;
-  --color-share-4: #c08d5f;
-  --color-share-5: #e0bd9a;
-  --color-share-6: #d5d0c9;
+  --color-share-1: var(--share-1);
+  --color-share-2: var(--share-2);
+  --color-share-3: var(--share-3);
+  --color-share-4: var(--share-4);
+  --color-share-5: var(--share-5);
+  --color-share-6: var(--share-6);
 
-  /* Chart furniture. */
-  --color-grid: #e6e2dd;
-  --color-rule: #d5d0c9;
+  --color-liquor-black: var(--liquor-black);
+  --color-liquor-chai: var(--liquor-chai);
+  --color-liquor-oolong: var(--liquor-oolong);
+  --color-liquor-herbal: var(--liquor-herbal);
+  --color-liquor-green: var(--liquor-green);
+  --color-liquor-white: var(--liquor-white);
 
-  /* ── Shape ────────────────────────────────────────────────────────────────
-     Near-flat. Nothing in this app is rounder than 6px, and the legacy
-     `rounded-xl` / `rounded-2xl` classes are re-pointed rather than left to
-     render a 16px pill until each component is swept. */
-  --radius-sm: 2px;
-  --radius-md: 3px;
-  --radius-lg: 4px;
-  --radius-xl: 4px;
-  --radius-2xl: 4px;
-  --radius-3xl: 6px;
+  --color-grid: var(--grid);
+  --color-rule: var(--rule);
+  --color-scrim: var(--scrim);
 
-  /* ── Elevation ────────────────────────────────────────────────────────────
-     ONE shadow. It is for things that float above the page — drawers, the
-     command palette, toasts, the bulk-action bar. Nothing inline gets a shadow;
-     a card is separated by its border alone. */
-  --shadow-overlay: 0 10px 30px -8px rgb(35 32 29 / 0.20), 0 2px 8px -3px rgb(35 32 29 / 0.12);
+  /* Kept for the few places that still need a flat neutral step. */
+  --color-n-200: var(--sunken);
+  --color-n-400: var(--faint);
 
-  /* ── Motion ───────────────────────────────────────────────────────────────
-     120–180ms ease-out, and only on things that enter or leave. Data never
-     animates: a number that fades in is a number you cannot trust at a glance. */
+  /* ── Shape ──────────────────────────────────────────────────────────────── */
+  /* Softer than the flat system's 4px cap: a 2px corner under a 10px shadow
+     reads as a printing error rather than an extrusion. These are the radii the
+     shadow geometry was tuned against. */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
+  --radius-3xl: 28px;
+
+  /* ── Elevation ──────────────────────────────────────────────────────────── */
+  /* One formula, three sizes, two directions. `--hi` and `--lo` are theme
+     values, so every shadow re-points itself when the theme flips.
+
+     `--shadow-raised-lg` is for the three things that float above the page: the
+     drawer, a toast, and the bulk-action bar. Anything floating on a SCRIM does
+     NOT get one - the dimmed backdrop already separates it, and doing both is
+     two answers to the same question. That is why the command palette is a
+     plain panel. */
+  --shadow-raised: 5px 5px 11px var(--lo), -5px -5px 11px var(--hi);
+  --shadow-raised-sm: 3px 3px 6px var(--lo), -3px -3px 6px var(--hi);
+  --shadow-raised-lg: 14px 14px 32px var(--lo), -10px -10px 26px var(--hi);
+  --shadow-pressed: inset 4px 4px 9px var(--lo), inset -4px -4px 9px var(--hi);
+  --shadow-pressed-sm: inset 2px 2px 5px var(--lo), inset -2px -2px 5px var(--hi);
+  /* Things that float keep the name the rest of the app already uses. */
+  --shadow-overlay: 14px 14px 32px var(--lo), -10px -10px 26px var(--hi);
+
+  /* ── Motion ─────────────────────────────────────────────────────────────── */
+  /* 120-180ms ease-out, and the list of things allowed to use it is short and
+     closed: overlays entering (drawer, toast, bulk bar), the theme knob
+     sliding, and the rail collapsing. Every one is a DELIBERATE act by the
+     person at the keyboard – they pressed something, and the interface is
+     showing them what it did. Data never animates: a figure that fades in is a
+     figure you have to wait before you can trust. */
   --ease-out-quick: cubic-bezier(0.22, 0.61, 0.36, 1);
   --animate-overlay-in: overlay-in 140ms var(--ease-out-quick);
   --animate-drawer-in: drawer-in 160ms var(--ease-out-quick);
   --animate-toast-in: toast-in 140ms var(--ease-out-quick);
+}
+
+/* ── Depth utilities ────────────────────────────────────────────────────────
+   Real utilities, so they compose with variants: `hover:neu-raised-sm`,
+   `active:neu-pressed`, `aria-checked:neu-pressed`. */
+
+@utility neu-raised {
+  box-shadow: var(--shadow-raised);
+}
+
+@utility neu-raised-sm {
+  box-shadow: var(--shadow-raised-sm);
+}
+
+@utility neu-raised-lg {
+  box-shadow: var(--shadow-raised-lg);
+}
+
+@utility neu-pressed {
+  box-shadow: var(--shadow-pressed);
+}
+
+@utility neu-pressed-sm {
+  box-shadow: var(--shadow-pressed-sm);
+}
+
+@utility neu-flat {
+  box-shadow: none;
 }
 
 @keyframes overlay-in {
@@ -174,41 +414,69 @@
 }
 
 html {
-  background: var(--color-canvas);
+  background: var(--canvas);
 }
 
 body {
   margin: 0;
+  background: var(--canvas);
   font-family: var(--font-sans);
   font-size: var(--text-base);
   line-height: var(--text-base--line-height);
-  color: var(--color-body);
+  color: var(--body);
   /* Tabular figures everywhere, inherited. Prices, quantities and weights all
      have to line up in a column, and an ops tool has no display typography that
-     would suffer for it. `.tnum` below is now a reinforcement, not a switch. */
+     would suffer for it. */
   font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Global focus ring. Never add `focus:outline-none` anywhere — it out-specifies
-   this and strands keyboard users. */
+/* Global focus ring. Never add `focus:outline-none` anywhere  it out-specifies
+   this and strands keyboard users. It matters more here than in a flat design:
+   a neumorphic control has no border of its own to thicken on focus. */
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
-  border-radius: 2px;
+  border-radius: 6px;
+}
+
+/* The ONE sanctioned way out of the ring, and it is deliberately not a Tailwind
+   utility. `focus-visible:outline-none` cannot work in this app: the rule above
+   is unlayered and beats anything in `@layer utilities` regardless of
+   specificity, so writing it produces a class that silently does nothing. This
+   selector is unlayered too and one specificity step higher, so it actually
+   wins – which means removing a focus ring has to be a conscious, greppable act
+   rather than a utility someone sprinkles on.
+
+   Allowed on a TEXT INPUT ONLY, and only where the caret is already an
+   unambiguous focus indicator – in practice, the autofocused field of a modal
+   that exists solely to be typed into. Never on a button, a link, a checkbox or
+   anything else with no caret of its own. */
+.focus-ring-none:focus-visible {
+  outline: none;
 }
 
 .tnum {
   font-variant-numeric: tabular-nums;
 }
 
-/* The one escape hatch, for the rare figure that is set large enough that
-   tabular spacing reads as loose rather than aligned. */
+/* The one escape hatch, for a figure set large enough that tabular spacing
+   reads as loose rather than aligned. */
 .pnum {
   font-variant-numeric: proportional-nums;
 }
 
+/* NOTE — do not reintroduce a `button { color: inherit }` rule here.
+   Plain CSS in this file is UNLAYERED, and unlayered rules beat anything in
+   `@layer utilities` no matter how specific the utility is. A rule like that
+   silently kills every `text-*` colour on every button in the app: the text
+   inherits from its parent and no amount of `text-accent` will override it.
+   Tailwind's preflight already sets `font: inherit` on form controls, which was
+   the only useful half. Theme colour reaches these elements through utilities.
+*/
+
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {

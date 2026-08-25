@@ -20,13 +20,13 @@ import { useToast } from '../components/ui/Toast'
 /* ────────────────────────────────────────────────────────────────────────────
  * The trade price list.
  *
- * Wholesale is not "retail with a discount field" — it is a second price world
+ * Wholesale is not "retail with a discount field"  it is a second price world
  * with its own list, its own minimums and its own arithmetic. What a trade buyer
  * asks is never "what is the unit price"; it is "what does a case cost me and
  * how many must I take", so those are columns here, not something to work out.
  *
  * Margin is shown against the storefront's retail price so a trade price can be
- * sanity-checked without leaving the row. It is a gross figure — this app knows
+ * sanity-checked without leaving the row. It is a gross figure – this app knows
  * nothing about cost of goods, and says so rather than implying it does.
  * ──────────────────────────────────────────────────────────────────────────── */
 
@@ -64,7 +64,7 @@ export default function WholesalePage() {
       .map((line) => {
         const trade = line.variant.wholesalePrice
         const retail = line.retailPrice
-        // Gross margin against RETAIL, not cost — this app has no cost of goods.
+        // Gross margin against RETAIL, not cost – this app has no cost of goods.
         const margin = retail > 0 ? ((retail - trade) / retail) * 100 : null
         return {
           line,
@@ -97,7 +97,7 @@ export default function WholesalePage() {
     if (!current) return
     const previous = current[field]
     if (!updateVariantOps(key, { [field]: Number(next) })) {
-      notify(`Storage refused the write — ${label} is unchanged`, 'error')
+      notify(`Storage refused the write – ${label} is unchanged`, 'error')
       return
     }
     notify(`${sku}: ${label} updated`, {
@@ -148,12 +148,12 @@ export default function WholesalePage() {
       header: 'Retail',
       align: 'right',
       width: 104,
-      headerTitle: 'Storefront price — read-only here',
+      headerTitle: 'Storefront price – read-only here',
       render: (row) =>
         row.line.retailPrice > 0 ? (
           <span className="text-body">{formatINR(row.line.retailPrice)}</span>
         ) : (
-          <span className="text-muted">—</span>
+          <span className="text-muted"></span>
         ),
     },
     {
@@ -180,7 +180,7 @@ export default function WholesalePage() {
       headerTitle: 'Gross, against retail. This app has no cost of goods.',
       render: (row) =>
         row.margin === null ? (
-          <span className="text-muted">—</span>
+          <span className="text-muted"></span>
         ) : (
           <span className={row.margin < 30 ? 'font-semibold text-warn' : 'text-body'}>
             {row.margin.toFixed(0)}%
@@ -245,15 +245,15 @@ export default function WholesalePage() {
       : listed.reduce((sum, row) => sum + (row.margin ?? 0), 0) / listed.length
 
   return (
-    <div className="flex flex-col gap-3 p-3">
-      <section aria-label="Trade list at a glance" className="grid gap-2 sm:grid-cols-3">
+    <div className="flex flex-col gap-4 p-4">
+      <section aria-label="Trade list at a glance" className="grid gap-4 sm:grid-cols-3">
         <StatTile label="SKUs on the trade list" value={formatCount(listed.length)} hint={`of ${pluralise(lines.length, 'SKU')} in the catalogue`} />
-        <StatTile label="Average gross margin" value={`${averageMargin.toFixed(0)}%`} hint="Against retail — not against cost" />
+        <StatTile label="Average gross margin" value={`${averageMargin.toFixed(0)}%`} hint="Against retail – not against cost" />
         <StatTile
           label="Smallest case"
           value={
             listed.length === 0
-              ? '—'
+              ? ''
               : formatINR(Math.min(...listed.map((row) => row.caseValue)))
           }
           hint="Lowest minimum a buyer can place"
@@ -316,7 +316,7 @@ export default function WholesalePage() {
       <Card className="px-3 py-2.5">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">Terms</h2>
         <p className="mt-1 text-sm text-body">
-          This list is recorded by the dashboard, not by the storefront — the shop has one price world and
+          This list is recorded by the dashboard, not by the storefront – the shop has one price world and
           it is retail. It was seeded at 60% of retail on {formatDate(ops.seededAt)} and shows your edits
           since. Payment terms and lead times are not modelled here: there is no supplier or account
           record to hang them on, and a term this app invented would be a term nobody agreed to.

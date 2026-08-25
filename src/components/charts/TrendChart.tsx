@@ -11,7 +11,7 @@ const PAD = { top: 16, right: 18, bottom: 26, left: 56 }
 
 /**
  * One series over time: 2px line, a 10% wash beneath it, hairline grid, and a
- * crosshair on hover. Segments are straight — a smoothed curve would draw
+ * crosshair on hover. Segments are straight – a smoothed curve would draw
  * values between two days that never happened.
  */
 export function TrendChart({
@@ -23,7 +23,7 @@ export function TrendChart({
 }: {
   points: TrendPoint[]
   height?: number
-  /** Axis ticks — keep this one short (compact figures). */
+  /** Axis ticks – keep this one short (compact figures). */
   formatValue: (value: number) => string
   /** Tooltip and direct labels, where the exact figure is worth the space. */
   formatDetail?: (value: number) => string
@@ -164,7 +164,7 @@ export function TrendChart({
           </g>
         )}
 
-        {/* One wide hit target per day — a 2px line is impossible to hover. */}
+        {/* One wide hit target per day – a 2px line is impossible to hover. */}
         {points.map((point, index) => (
           <rect
             key={`hit-${point.key}`}
@@ -181,7 +181,7 @@ export function TrendChart({
 
       {activePoint && (
         <div
-          className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-lg border border-line bg-surface px-3 py-2 text-xs shadow-overlay"
+          className="pointer-events-none absolute z-10 -translate-x-1/2 -translate-y-full rounded-md bg-surface px-3 py-2 text-xs neu-raised"
           style={{
             left: Math.min(Math.max(xFor(active ?? 0), 70), width - 70),
             top: yFor(activePoint.value) - 10,

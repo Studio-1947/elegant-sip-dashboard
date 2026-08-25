@@ -3,12 +3,12 @@
  *
  * The storefront's `Product` knows what a customer needs to know: name, price,
  * tasting notes, a stock number. It has no SKU, no weight as a number, no trade
- * price, no minimum order quantity, and no concept of a LOT — which is the unit
+ * price, no minimum order quantity, and no concept of a LOT – which is the unit
  * tea is actually bought, stored and sold out of. A shop can ship without those.
  * A back office cannot.
  *
- * Rather than fork the catalogue — the one thing this app has always refused to
- * do — those fields live here, in the dashboard's own namespace, joined to the
+ * Rather than fork the catalogue – the one thing this app has always refused to
+ * do – those fields live here, in the dashboard's own namespace, joined to the
  * storefront's records by id. It is the same move `fulfilment.ts` already makes
  * for order stages, for the same reason: the storefront should not have to
  * tolerate fields it never asked for.
@@ -27,7 +27,7 @@ import { PRODUCTS, type Product, type ProductVariant } from '@storefront/data/pr
 import { DASHBOARD_KEYS, writeJson } from './storage'
 
 /** The spec's category vocabulary. The catalogue is six Darjeelings, so every
-    one of them seeds as `black` — the field exists for when it stops being. */
+    one of them seeds as `black`  the field exists for when it stops being. */
 export type TeaType = 'black' | 'green' | 'oolong' | 'white' | 'herbal' | 'chai'
 
 export const TEA_TYPES: { id: TeaType; label: string }[] = [
@@ -40,7 +40,7 @@ export const TEA_TYPES: { id: TeaType; label: string }[] = [
 ]
 
 export interface VariantOps {
-  /** `${productId}::${size}` — the join key back to the catalogue. */
+  /** `${productId}::${size}`  the join key back to the catalogue. */
   key: string
   productId: string
   size: string
@@ -61,7 +61,7 @@ export interface Lot {
   code: string
   harvestYear: number
   garden: string
-  /** Arrival date. FIFO order is this, ascending — oldest sells first. */
+  /** Arrival date. FIFO order is this, ascending – oldest sells first. */
   receivedAt: string
   bestBefore: string
   units: number
@@ -187,7 +187,7 @@ export const writeOps = (store: OpsStore): boolean => writeJson(DASHBOARD_KEYS.o
    Derived from the catalogue, deterministic given a date. The lot split is the
    one modelling choice here: catalogue stock is one static number per variant,
    and real stock arrives in batches, so it is halved into an older lot and a
-   newer one. That invents no units — the two lots always sum to the figure the
+   newer one. That invents no units – the two lots always sum to the figure the
    storefront already publishes. */
 
 const MONTH = 30 * 86_400_000
@@ -216,7 +216,7 @@ export function buildOpsSeed(now: Date): OpsStore {
         size: variant.size,
         sku,
         grams: grams(variant.size),
-        // Trade at 60% of retail, rounded to the rupee — a starting list, meant
+        // Trade at 60% of retail, rounded to the rupee – a starting list, meant
         // to be edited, not a claim about what anyone has been charged.
         wholesalePrice: Math.round(variant.price * 0.6),
         moq: variant.price >= 1000 ? 6 : 12,

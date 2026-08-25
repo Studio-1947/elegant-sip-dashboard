@@ -1,5 +1,5 @@
 /* Inline stroke icons. The storefront bans emoji in UI and this app follows the
-   same rule — an emoji renders differently on every platform and carries an
+   same rule – an emoji renders differently on every platform and carries an
    announced name screen readers were never meant to read out as a button. */
 
 interface IconProps {
@@ -174,7 +174,7 @@ export const HomeIcon = (props: IconProps) => (
   </Svg>
 )
 
-/** Inventory — a sealed carton, not a warehouse. Lots ship in boxes. */
+/** Inventory – a sealed carton, not a warehouse. Lots ship in boxes. */
 export const BoxIcon = (props: IconProps) => (
   <Svg {...props}>
     <path d="M12 3 4 7v10l8 4 8-4V7z" />
@@ -199,10 +199,24 @@ export const ChartIcon = (props: IconProps) => (
   </Svg>
 )
 
+/**
+ * A gear, and it has to be a real one.
+ *
+ * This used to be a hub with six radiating spokes, which is the same drawing as
+ * SunIcon — and SunIcon is the light-theme marker sitting directly above it in
+ * the rail. Two adjacent controls rendering as the same glyph is not a style
+ * problem, it is a wrong click waiting to happen.
+ *
+ * What separates a gear from a sun is that its teeth are part of a CONTINUOUS
+ * rim, not detached rays. So this is one closed path: eight teeth, each an arc
+ * across the tip, a flank down, and an arc across the valley. Generated rather
+ * than eyeballed, so the teeth are evenly spaced and the flanks are symmetric.
+ * Tip radius 9.5 leaves 1.7px of margin at stroke 1.6, so nothing clips.
+ */
 export const SettingsIcon = (props: IconProps) => (
   <Svg {...props}>
-    <circle cx="12" cy="12" r="3" />
-    <path d="M12 2.5v2.2M12 19.3v2.2M4.2 7.2l1.9 1.1M17.9 15.7l1.9 1.1M4.2 16.8l1.9-1.1M17.9 8.3l1.9-1.1" />
+    <path d="M10.19 2.67 A9.5 9.5 0 0 1 13.81 2.67 L14.05 5.31 A7 7 0 0 1 15.29 5.82 L17.31 4.12 A9.5 9.5 0 0 1 19.88 6.69 L18.18 8.71 A7 7 0 0 1 18.69 9.95 L21.33 10.19 A9.5 9.5 0 0 1 21.33 13.81 L18.69 14.05 A7 7 0 0 1 18.18 15.29 L19.88 17.31 A9.5 9.5 0 0 1 17.31 19.88 L15.29 18.18 A7 7 0 0 1 14.05 18.69 L13.81 21.33 A9.5 9.5 0 0 1 10.19 21.33 L9.95 18.69 A7 7 0 0 1 8.71 18.18 L6.69 19.88 A9.5 9.5 0 0 1 4.12 17.31 L5.82 15.29 A7 7 0 0 1 5.31 14.05 L2.67 13.81 A9.5 9.5 0 0 1 2.67 10.19 L5.31 9.95 A7 7 0 0 1 5.82 8.71 L4.12 6.69 A9.5 9.5 0 0 1 6.69 4.12 L8.71 5.82 A7 7 0 0 1 9.95 5.31 Z" />
+    <circle cx="12" cy="12" r="3.4" />
   </Svg>
 )
 
@@ -220,7 +234,7 @@ export const UserIcon = (props: IconProps) => (
   </Svg>
 )
 
-/** The rail's collapse handle — a panel with its edge pushed in. */
+/** The rail's collapse handle – a panel with its edge pushed in. */
 export const PanelIcon = (props: IconProps) => (
   <Svg {...props}>
     <rect x="3.5" y="4.5" width="17" height="15" rx="2" />
@@ -232,6 +246,27 @@ export const ClockIcon = (props: IconProps) => (
   <Svg {...props}>
     <circle cx="12" cy="12" r="8" />
     <path d="M12 7.5V12l3 2" />
+  </Svg>
+)
+
+export const LockIcon = (props: IconProps) => (
+  <Svg {...props}>
+    <rect x="4.5" y="10.5" width="15" height="10" rx="2" />
+    <path d="M8 10.5V7.5a4 4 0 0 1 8 0v3" />
+    <path d="M12 14.5v2.5" />
+  </Svg>
+)
+
+export const SunIcon = (props: IconProps) => (
+  <Svg {...props}>
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2.5v2.5M12 19v2.5M4.2 4.2l1.8 1.8M18 18l1.8 1.8M2.5 12H5M19 12h2.5M4.2 19.8 6 18M18 6l1.8-1.8" />
+  </Svg>
+)
+
+export const MoonIcon = (props: IconProps) => (
+  <Svg {...props}>
+    <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z" />
   </Svg>
 )
 

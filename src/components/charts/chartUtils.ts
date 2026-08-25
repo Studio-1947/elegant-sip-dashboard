@@ -1,7 +1,7 @@
 /* ────────────────────────────────────────────────────────────────────────────
  * Chart primitives: scales, ticks, and the width measurement every SVG needs.
  *
- * Charts are hand-drawn SVG rather than a charting library — the whole app has
+ * Charts are hand-drawn SVG rather than a charting library – the whole app has
  * two runtime dependencies, and a dashboard of six chart types does not justify
  * a third.
  * ──────────────────────────────────────────────────────────────────────────── */
@@ -11,15 +11,15 @@ import { useEffect, useRef, useState } from 'react'
 /**
  * Part-to-whole slots.
  *
- * Not six hues — one. Green, amber, red and blue are reserved for status in
- * this app and may never be spent on decoration, and the design system allows a
- * single accent, so the slots separate by LIGHTNESS along the copper ramp
- * instead of by hue. That also makes them robust in a way a rainbow is not:
+ * Not six hues – one. Green, amber and red are reserved for status in this app
+ * and may never be spent on decoration, and the design system allows a single
+ * accent, so the slots separate by LIGHTNESS along the accent ramp instead of
+ * by hue. That also makes them robust in a way a rainbow is not:
  * they stay distinguishable in greyscale, on a bad projector, and under every
  * form of colour blindness.
  *
- * The cost is that a slot's text has to switch: the first three are dark enough
- * for white, the last three need ink. `shareTextClass` decides.
+ * The cost is that a slot's text has to switch, and which way it switches
+ * depends on the theme – see `shareTextColor`.
  */
 export const SHARE = [
   'var(--color-share-1)',
@@ -30,7 +30,7 @@ export const SHARE = [
   'var(--color-share-6)',
 ] as const
 
-/** Single-series marks wear the accent — 5.6:1 on white. */
+/** Single-series marks wear the accent  5.6:1 on white. */
 export const ACCENT = 'var(--color-accent)'
 export const GRID = 'var(--color-grid)'
 export const RULE = 'var(--color-rule)'
@@ -38,9 +38,17 @@ export const RULE = 'var(--color-rule)'
 /** Slot for `index`; past the last slot the caller must fold to "Other". */
 export const shareColor = (index: number): string => SHARE[Math.min(index, SHARE.length - 1)]
 
-/** Readable label colour for a slot — the ramp crosses over at slot 4. */
-export const shareTextClass = (index: number): string =>
-  Math.min(index, SHARE.length - 1) < 3 ? 'text-white' : 'text-ink'
+/**
+ * Readable label colour for a slot.
+ *
+ * Each slot carries its own paired `--share-on-N`, rather than a rule like
+ * "slots 1-3 take white". The crossover point MOVES between themes: on the
+ * light canvas the ramp runs dark-to-pale and the first slots take white, on
+ * the dark canvas it inverts and they take ink. A hard-coded index would be
+ * right in one theme and unreadable in the other.
+ */
+export const shareTextColor = (index: number): string =>
+  `var(--share-on-${Math.min(index, SHARE.length - 1) + 1})`
 
 /**
  * Round a maximum up to a clean axis top (1 / 2 / 5 × 10ⁿ) and return evenly
@@ -58,7 +66,7 @@ export function niceTicks(max: number, count = 4): { ticks: number[]; top: numbe
   return { ticks, top }
 }
 
-/** Straight-segment path — no curve smoothing, which would invent values
+/** Straight-segment path – no curve smoothing, which would invent values
     between two days that never existed. */
 export function linePath(points: { x: number; y: number }[]): string {
   if (points.length === 0) return ''

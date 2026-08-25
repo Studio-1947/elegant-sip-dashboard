@@ -61,7 +61,7 @@ export default function CustomersPage() {
     return [...filtered].sort(sorters[sort])
   }, [customers, values.q, values.segment, sort])
 
-  /* The open customer is the route, like orders and SKUs — so a link to a
+  /* The open customer is the route, like orders and SKUs – so a link to a
      customer is a link to a customer, and a reload keeps the panel open. */
   const focused = route.param
   const selectedCustomer = useMemo(
@@ -119,7 +119,7 @@ export default function CustomersPage() {
         </button>
       ),
     },
-    { id: 'city', header: 'City', render: (customer) => <span className="truncate text-body">{customer.city || '—'}</span> },
+    { id: 'city', header: 'City', render: (customer) => <span className="truncate text-body">{customer.city || ''}</span> },
     {
       id: 'orders',
       header: 'Orders',
@@ -164,8 +164,8 @@ export default function CustomersPage() {
   ].filter(Boolean) as { field: string; value: string; key: 'segment' | 'range' | 'q' }[]
 
   return (
-    <div className="flex flex-col gap-3 p-3">
-      <section aria-label="Customer figures" className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="flex flex-col gap-4 p-4">
+      <section aria-label="Customer figures" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatTile label="Customers" value={formatCount(customers.length)} hint="Unique email addresses" />
         <StatTile
           label="Repeat customers"
@@ -176,7 +176,7 @@ export default function CustomersPage() {
         <StatTile
           label="Newsletter subscribers"
           value={formatCount(subscribers.length)}
-          hint="Stored locally — no email service is connected"
+          hint="Stored locally – no email service is connected"
         />
       </section>
 
@@ -229,7 +229,7 @@ export default function CustomersPage() {
           empty={
             <EmptyState
               title="No customers match"
-              message="Orders create customers — widen the range or clear the search."
+              message="Orders create customers – widen the range or clear the search."
               action={<Button onClick={() => clear()}>Clear filters</Button>}
             />
           }
@@ -237,7 +237,7 @@ export default function CustomersPage() {
       </Card>
 
       <p className="text-xs text-muted">
-        Grouped by email address — the only stable identity a demo checkout collects.
+        Grouped by email address – the only stable identity a demo checkout collects.
       </p>
 
       <BulkBar count={selected.size} noun="customer" onClear={() => setSelected(new Set())}>
@@ -258,13 +258,13 @@ export default function CustomersPage() {
               <Stat label="Lifetime spend" value={formatINR(selectedCustomer.spend)} />
               <Stat label="Orders" value={formatCount(selectedCustomer.orders)} />
               <Stat label="Packs" value={formatCount(selectedCustomer.units)} />
-              <Stat label="City" value={selectedCustomer.city || '—'} />
+              <Stat label="City" value={selectedCustomer.city || ''} />
               <Stat label="First order" value={formatDate(selectedCustomer.firstOrder)} />
               <Stat label="Last order" value={formatDate(selectedCustomer.lastOrder)} />
             </dl>
             <section>
               <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">Orders</h3>
-              <ul className="mt-1.5 divide-y divide-line rounded-lg border border-line bg-surface">
+              <ul className="mt-1.5 divide-y divide-line rounded-lg bg-surface neu-raised">
                 {selectedCustomer.orderNumbers.map((number) => (
                   <li key={number}>
                     <button
@@ -288,7 +288,7 @@ export default function CustomersPage() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-line bg-surface px-2 py-1.5">
+    <div className="rounded-md bg-surface neu-raised-sm px-2 py-1.5">
       <dt className="text-xs uppercase tracking-wider text-muted">{label}</dt>
       <dd className="mt-0.5 truncate font-semibold text-ink">{value}</dd>
     </div>

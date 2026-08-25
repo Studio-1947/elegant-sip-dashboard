@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react'
 /* ────────────────────────────────────────────────────────────────────────────
  * A cell you can type into.
  *
- * Editing stock or a price should not cost a drawer, a form and a Save button —
+ * Editing stock or a price should not cost a drawer, a form and a Save button 
  * it is one number, and the table is where you are already looking. Click it,
  * or focus the row and press Enter.
  *
@@ -17,7 +17,7 @@ import { useEffect, useRef, useState } from 'react'
  *   keystroke away.
  *
  * Escape abandons the edit, which is the one case where reverting silently is
- * right — the user just said so.
+ * right – the user just said so.
  * ──────────────────────────────────────────────────────────────────────────── */
 
 export interface EditableCellProps {
@@ -25,7 +25,7 @@ export interface EditableCellProps {
   value: string
   /** What the cell shows when it is not being edited. */
   display: string
-  /** Accessible name — "Stock for ES-FF-WL-100" reads better than "Stock". */
+  /** Accessible name – "Stock for ES-FF-WL-100" reads better than "Stock". */
   label: string
   onCommit: (next: string) => void
   /** Return a fix-it message, or null when the value is good. */
@@ -89,9 +89,8 @@ export function EditableCell({
         onClick={start}
         disabled={disabled}
         aria-label={`${label}: ${display}. Click to edit.`}
-        className={`-mx-1 flex w-full items-center rounded-sm px-1 py-0.5 hover:bg-accent-soft disabled:cursor-not-allowed disabled:hover:bg-transparent ${
-          align === 'right' ? 'justify-end' : 'justify-start'
-        } ${disabled ? 'text-muted' : 'text-ink'}`}
+        className={`-mx-1.5 flex w-full items-center rounded-md px-1.5 py-1 hover:bg-sunken hover:neu-pressed-sm disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:neu-flat ${align === 'right' ? 'justify-end' : 'justify-start'
+          } ${disabled ? 'text-muted' : 'text-ink'}`}
       >
         {display}
       </button>
@@ -124,9 +123,8 @@ export function EditableCell({
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? 'cell-error' : undefined}
         inputMode={validate ? 'decimal' : undefined}
-        className={`h-7 w-full rounded-sm border bg-surface px-1.5 text-sm text-ink ${
-          align === 'right' ? 'text-right' : 'text-left'
-        } ${error ? 'border-critical' : 'border-accent'}`}
+        className={`h-8 w-full rounded-md bg-sunken px-2 text-sm text-ink neu-pressed-sm ${align === 'right' ? 'text-right' : 'text-left'
+          } ${error ? 'text-critical outline outline-1 outline-critical' : ''}`}
         style={prefix ? { paddingLeft: '1.1rem' } : undefined}
       />
       {prefix && (
@@ -140,7 +138,7 @@ export function EditableCell({
         <span
           id="cell-error"
           role="alert"
-          className="absolute left-0 top-full z-20 mt-1 w-max max-w-56 rounded-sm border border-critical/30 bg-critical-soft px-1.5 py-1 text-xs font-medium text-critical shadow-overlay"
+          className="absolute left-0 top-full z-20 mt-1.5 w-max max-w-56 rounded-md bg-surface px-2 py-1.5 text-xs font-medium text-critical neu-raised"
         >
           {error}
         </span>
@@ -154,22 +152,22 @@ export function EditableCell({
 
 export const wholeUnits =
   (noun = 'packs') =>
-  (next: string): string | null => {
-    if (next === '') return `Enter a number of ${noun} — use 0 for none.`
-    const parsed = Number(next)
-    if (!Number.isFinite(parsed)) return `Enter a whole number of ${noun}, like 24.`
-    if (!Number.isInteger(parsed)) return `Enter a whole number of ${noun} — half a pack cannot ship.`
-    if (parsed < 0) return `Enter 0 or more ${noun}. To mark a lot gone, set it to 0.`
-    if (parsed > 100_000) return `Enter ${noun} under 100,000 — anything larger is probably a typo.`
-    return null
-  }
+    (next: string): string | null => {
+      if (next === '') return `Enter a number of ${noun}  use 0 for none.`
+      const parsed = Number(next)
+      if (!Number.isFinite(parsed)) return `Enter a whole number of ${noun}, like 24.`
+      if (!Number.isInteger(parsed)) return `Enter a whole number of ${noun}  half a pack cannot ship.`
+      if (parsed < 0) return `Enter 0 or more ${noun}. To mark a lot gone, set it to 0.`
+      if (parsed > 100_000) return `Enter ${noun} under 100,000  anything larger is probably a typo.`
+      return null
+    }
 
 export const rupees = (next: string): string | null => {
   if (next === '') return 'Enter a price in rupees, or 0 while the tea is unpriced.'
   const parsed = Number(next)
   if (!Number.isFinite(parsed)) return 'Enter a price in rupees, like 600 or 649.50.'
   if (parsed < 0) return 'Enter 0 or more. A negative price would invert the order total.'
-  if (Math.round(parsed * 100) !== parsed * 100) return 'Round to the paisa — two decimal places at most.'
-  if (parsed > 1_000_000) return 'Enter a price under ₹10,00,000 — check for an extra zero.'
+  if (Math.round(parsed * 100) !== parsed * 100) return 'Round to the paisa – two decimal places at most.'
+  if (parsed > 1_000_000) return 'Enter a price under ₹10,00,000  check for an extra zero.'
   return null
 }

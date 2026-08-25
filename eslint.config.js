@@ -18,7 +18,7 @@ export default tseslint.config(
     rules: {
       ...reactHooks.configs.recommended.rules,
 
-      // Same rules the storefront runs — this app reads the same user-editable
+      // Same rules the storefront runs  this app reads the same user-editable
       // localStorage, so `any` is exactly how an unvalidated shape gets in.
       'no-console': ['error', { allow: ['warn', 'error', 'info'] }],
       '@typescript-eslint/no-explicit-any': 'error',

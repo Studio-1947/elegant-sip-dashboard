@@ -48,8 +48,8 @@ export default function OrdersPage({ focusOrder }: { focusOrder?: string }) {
   const sort = values.sort as SortId
 
   /* The open order is the route (#/orders/ES-DEMO-1004?stage=new), not component
-     state: the panel is deep-linkable, Back closes it, and — because the query
-     rides along — closing it drops you back into the same filtered list. */
+     state: the panel is deep-linkable, Back closes it, and – because the query
+     rides along – closing it drops you back into the same filtered list. */
   const openOrder = (number: string) => navigate('orders', { param: number, query: route.query })
   const closeDrawer = () => navigate('orders', { query: route.query })
 
@@ -93,7 +93,7 @@ export default function OrdersPage({ focusOrder }: { focusOrder?: string }) {
   const applyStage = (numbers: string[], next: Stage) => {
     const previous = stageSnapshot(numbers)
     if (!updateStages(numbers, next)) {
-      notify('Storage refused the write — no stage was changed', 'error')
+      notify('Storage refused the write – no stage was changed', 'error')
       return
     }
     setSelected(new Set())
@@ -102,7 +102,7 @@ export default function OrdersPage({ focusOrder }: { focusOrder?: string }) {
         label: 'Undo',
         onClick: () => {
           if (undoStages(previous)) notify('Stage change undone')
-          else notify('Storage refused the write — the change is still applied', 'error')
+          else notify('Storage refused the write – the change is still applied', 'error')
         },
       },
     })
@@ -162,15 +162,15 @@ export default function OrdersPage({ focusOrder }: { focusOrder?: string }) {
       header: 'Customer',
       render: (order) => (
         <span className="block min-w-0">
-          <span className="block truncate text-ink">{order.name || '—'}</span>
-          <span className="block truncate text-xs text-muted">{order.email || '—'}</span>
+          <span className="block truncate text-ink">{order.name || ''}</span>
+          <span className="block truncate text-xs text-muted">{order.email || ''}</span>
         </span>
       ),
     },
     {
       id: 'city',
       header: 'City',
-      render: (order) => <span className="truncate text-body">{order.city || '—'}</span>,
+      render: (order) => <span className="truncate text-body">{order.city || ''}</span>,
     },
     {
       id: 'packs',
@@ -224,7 +224,7 @@ export default function OrdersPage({ focusOrder }: { focusOrder?: string }) {
   ].filter(Boolean) as { field: string; value: string; key: 'stage' | 'range' | 'q' }[]
 
   return (
-    <div className="flex flex-col gap-3 p-3">
+    <div className="flex flex-col gap-4 p-4">
       <SavedViews route="orders" views={viewCounts} current={route.query} />
 
       <FilterBar>
@@ -296,7 +296,7 @@ export default function OrdersPage({ focusOrder }: { focusOrder?: string }) {
       </Card>
 
       <p className="text-xs text-muted">
-        Stages are recorded by this dashboard only — changing one does not notify the customer.
+        Stages are recorded by this dashboard only – changing one does not notify the customer.
       </p>
 
       <BulkBar count={selected.size} noun="order" onClear={() => setSelected(new Set())}>

@@ -37,7 +37,9 @@ export function DensityToggle({
       onClick={() => onChange(compact ? 'comfortable' : 'compact')}
       aria-pressed={compact}
       title={compact ? 'Switch to 44px rows' : 'Switch to 32px rows'}
-      className="inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md border border-line bg-surface px-2.5 text-xs font-semibold text-body hover:bg-sunken hover:text-ink"
+      className={`inline-flex h-9 shrink-0 items-center gap-1.5 rounded-md px-3 text-xs font-semibold ${
+        compact ? 'bg-sunken text-accent neu-pressed-sm' : 'bg-surface text-body neu-raised-sm hover:text-ink'
+      }`}
     >
       <span className="flex h-3.5 w-3.5 flex-col justify-between" aria-hidden="true">
         <span className="h-px w-full bg-current" />

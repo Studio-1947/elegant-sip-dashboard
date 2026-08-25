@@ -6,7 +6,7 @@ export interface BarItem {
 }
 
 /**
- * Ranked horizontal bars — one series, so one colour for every bar. Colouring
+ * Ranked horizontal bars – one series, so one colour for every bar. Colouring
  * them by size would double-encode the length as hue and burn the only free
  * channel on information the bar already shows.
  *

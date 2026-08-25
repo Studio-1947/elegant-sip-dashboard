@@ -1,7 +1,7 @@
 /* ────────────────────────────────────────────────────────────────────────────
  * Aggregations that join orders to the catalogue and to customers.
  *
- * Product revenue here is GOODS revenue — unit price × quantity. It is
+ * Product revenue here is GOODS revenue – unit price × quantity. It is
  * deliberately not a share of `order.total`: shipping and GST belong to the
  * order, not to any one tea, and apportioning them would invent a number.
  * ──────────────────────────────────────────────────────────────────────────── */
@@ -22,7 +22,7 @@ export interface ProductPerformance {
   product: Product
   units: number
   revenue: number
-  /** Orders containing this product — not line count. */
+  /** Orders containing this product – not line count. */
   orders: number
   variants: VariantSales[]
   lastSold: string | null
@@ -138,13 +138,13 @@ export function customerBreakdown(orders: PlacedOrder[]): CustomerRecord[] {
     if (!existing) {
       rows.set(email, {
         email,
-        name: order.name || '—',
+        name: order.name || '',
         orders: 1,
         spend: order.total,
         units,
         firstOrder: order.date,
         lastOrder: order.date,
-        city: order.city || '—',
+        city: order.city || '',
         orderNumbers: [order.number],
       })
       continue

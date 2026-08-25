@@ -4,7 +4,7 @@
  * Two honesty rules govern this file:
  *
  * 1. Every value is user-editable, so nothing is trusted. A record that fails
- *    its shape check is dropped and counted — the Data page reports how many,
+ *    its shape check is dropped and counted – the Data page reports how many,
  *    rather than letting a malformed row quietly skew revenue.
  * 2. The dashboard NEVER writes to a storefront key as a side effect. Demo data
  *    goes to its own `elegant_sip_dash_*` namespace, as does fulfilment status,
@@ -28,14 +28,14 @@ export const STOREFRONT_KEYS = {
   orderNotes: 'elegant_sip_order_notes',
 } as const
 
-/** The dashboard's own namespace — never read by the storefront. */
+/** The dashboard's own namespace – never read by the storefront. */
 export const DASHBOARD_KEYS = {
   demoOrders: 'elegant_sip_dash_demo_orders',
   demoReviews: 'elegant_sip_dash_demo_reviews',
   demoSubscribers: 'elegant_sip_dash_demo_subscribers',
   fulfilment: 'elegant_sip_dash_fulfilment',
   mode: 'elegant_sip_dash_mode',
-  /** Interface preferences — row density, collapsed rail. See preferences.ts. */
+  /** Interface preferences – row density, collapsed rail. See preferences.ts. */
   preferences: 'elegant_sip_dash_prefs',
   /** Operational fields the storefront's catalogue has no place for: SKUs, tea
       type, wholesale prices, MOQ and lots. See ops.ts. */
@@ -194,7 +194,7 @@ export function readStringArray(key: string): string[] {
   return Array.isArray(parsed) ? parsed.filter((entry): entry is string => typeof entry === 'string') : []
 }
 
-/** Approximate footprint of one key, in bytes — shown on the Data page. */
+/** Approximate footprint of one key, in bytes – shown on the Data page. */
 export function keyBytes(key: string): number {
   const raw = readRaw(key)
   return raw ? new Blob([raw]).size : 0

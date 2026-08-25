@@ -3,8 +3,9 @@ import { useDataset } from '../../lib/datasetContext'
 import { actionableCount, exceptions } from '../../lib/exceptions'
 import { navigate } from '../../lib/router'
 import { initials } from '../../lib/format'
-import { BellIcon, SearchIcon, UserIcon } from '../ui/Icons'
+import { BellIcon, LockIcon, SearchIcon, UserIcon } from '../ui/Icons'
 import { CommandPalette } from './CommandPalette'
+import { useAuth } from './LoginScreen'
 
 /* ────────────────────────────────────────────────────────────────────────────
  * The top bar holds three things, and nothing else: search, notifications,
@@ -16,13 +17,14 @@ import { CommandPalette } from './CommandPalette'
  * Refresh moved to Settings, which is where a thing you touch twice a week
  * belongs. What is left is the row you reach for from any screen.
  *
- * The bell and the Home screen read the same `exceptions()` — a bell showing a
+ * The bell and the Home screen read the same `exceptions()`  a bell showing a
  * different number from the list underneath it would make both untrustworthy.
  * ──────────────────────────────────────────────────────────────────────────── */
 
 export function TopBar({ title }: { title: string; description: string }) {
   const { orders, fulfilment, ops, now, user, mode } = useDataset()
   const [searchOpen, setSearchOpen] = useState(false)
+  const { lock } = useAuth()
 
   const pending = useMemo(
     () => actionableCount(exceptions({ orders, fulfilment, ops, now })),
@@ -43,21 +45,24 @@ export function TopBar({ title }: { title: string; description: string }) {
   const account = user?.name ?? (mode === 'demo' ? 'Demo dataset' : 'No signed-in visitor')
 
   return (
-    <header className="flex h-12 shrink-0 items-center gap-2 border-b border-line bg-surface px-3">
+    <header className="flex h-14 shrink-0 items-center gap-2.5 bg-canvas px-3 lg:pr-4">
       {/* A button, not an input: the field itself lives in the palette, where it
           can own the keyboard. Clicking here and pressing ⌘K land in the same
           place, which is the point. */}
       <button
         type="button"
         onClick={() => setSearchOpen(true)}
-        className="flex h-8 min-w-0 flex-1 max-w-lg items-center gap-2 rounded-md border border-line bg-canvas px-2.5 text-sm text-muted hover:bg-sunken hover:text-body"
+        className="flex h-9 min-w-0 max-w-lg flex-1 items-center gap-2 rounded-full bg-sunken px-3.5 text-sm text-muted neu-pressed-sm hover:text-body"
       >
         <span className="h-3.5 w-3.5 shrink-0 text-faint">
           <SearchIcon />
         </span>
         <span className="truncate">Search orders, SKUs and customers</span>
-        <kbd className="ml-auto hidden shrink-0 rounded-sm border border-line px-1.5 text-xs text-muted sm:block">
-          ⌘K
+        <kbd className="ml-auto hidden shrink-0 rounded-sm bg-surface px-1.5 text-xs text-muted neu-raised-sm sm:block">
+          ⌘K 
+        </kbd>
+        <kbd className="hidden shrink-0 rounded-sm bg-surface px-1.5 text-xs text-muted neu-raised-sm sm:block">
+          Ctrl +K
         </kbd>
       </button>
 
@@ -70,7 +75,7 @@ export function TopBar({ title }: { title: string; description: string }) {
           type="button"
           onClick={() => navigate('home')}
           title={pending === 0 ? 'Nothing needs attention' : `${pending} things need attention`}
-          className="relative grid h-8 w-8 place-items-center rounded-md text-body hover:bg-sunken hover:text-ink"
+          className="relative grid h-9 w-9 place-items-center rounded-full bg-surface text-body neu-raised-sm hover:text-accent active:neu-pressed-sm"
         >
           <span className="sr-only">
             {pending === 0 ? 'Notifications: nothing needs attention' : `Notifications: ${pending} items`}
@@ -79,21 +84,37 @@ export function TopBar({ title }: { title: string; description: string }) {
             <BellIcon />
           </span>
           {pending > 0 && (
-            /* The count is the signal, not the colour — a bare red dot would say
+            /* The count is the signal, not the colour – a bare red dot would say
                "something" and make you go and look to find out what. */
-            <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-critical px-1 text-xs font-semibold leading-none text-white">
+            <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-critical px-1 text-xs font-semibold leading-none text-canvas">
               {pending > 9 ? '9+' : pending}
             </span>
           )}
         </button>
 
+        {/* Locking is the one thing you want to do WITHOUT putting the mouse
+            down, so it sits in the bar rather than three clicks into Settings.
+            It drops straight back to the sign-in screen; nothing is persisted,
+            so there is no session to expire. */}
+        <button
+          type="button"
+          onClick={lock}
+          title="Lock the dashboard"
+          className="grid h-9 w-9 place-items-center rounded-full bg-surface text-body neu-raised-sm hover:text-accent active:neu-pressed-sm"
+        >
+          <span className="sr-only">Lock the dashboard</span>
+          <span className="h-4 w-4">
+            <LockIcon />
+          </span>
+        </button>
+
         <button
           type="button"
           onClick={() => navigate('settings')}
-          title={`${account} — open Settings`}
-          className="flex h-8 items-center gap-1.5 rounded-md border border-line bg-surface pl-1 pr-2 text-sm text-body hover:bg-sunken hover:text-ink"
+          title={`${account}  open Settings`}
+          className="flex h-9 items-center gap-2 rounded-full bg-surface pl-1 pr-3 text-sm text-body neu-raised-sm hover:text-ink active:neu-pressed-sm"
         >
-          <span className="grid h-6 w-6 shrink-0 place-items-center rounded-sm bg-sunken text-xs font-semibold text-body">
+          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-sunken text-xs font-semibold text-body neu-pressed-sm">
             {user ? initials(user.name) : <span className="h-3.5 w-3.5"><UserIcon /></span>}
           </span>
           <span className="hidden max-w-32 truncate sm:block">{account}</span>

@@ -8,7 +8,7 @@ import { SkeletonTableRows } from '../ui/Skeleton'
  *
  * - The header sticks, and so does the first column. Scroll right through
  *   fifteen columns of an order and you can still see whose order it is.
- * - Rows are 44px, or 32px compact. The choice is a preference, not a filter —
+ * - Rows are 44px, or 32px compact. The choice is a preference, not a filter 
  *   it follows the person between screens instead of riding along in links.
  * - Every list is fully keyboard operable: ↑/↓ move, Home/End jump, Enter opens
  *   the record, Space selects, Shift+Space extends a range. One tab stop for
@@ -42,7 +42,7 @@ export interface DataTableProps<T> {
   density?: Density
   loading?: boolean
   empty?: ReactNode
-  /** Opening a record — Enter, or a click on the first cell's own control. */
+  /** Opening a record – Enter, or a click on the first cell's own control. */
   onOpen?: (row: T) => void
   /** Bulk selection. Omit entirely to render a table with no checkbox column. */
   selection?: {
@@ -160,15 +160,13 @@ export function DataTable<T>({
                 scope="col"
                 title={column.headerTitle}
                 style={column.width ? { width: column.width } : undefined}
-                className={`sticky top-0 z-20 whitespace-nowrap border-b border-line-strong bg-sunken px-3 py-1.5 font-semibold ${
-                  column.align === 'right' ? 'text-right' : 'text-left'
-                } ${
-                  index === 0 && !selection
+                className={`sticky top-0 z-20 whitespace-nowrap border-b border-line-strong bg-sunken px-3 py-1.5 font-semibold ${column.align === 'right' ? 'text-right' : 'text-left'
+                  } ${index === 0 && !selection
                     ? 'left-0 z-30 border-r border-line'
                     : index === 0
                       ? 'left-9 z-30 border-r border-line'
                       : ''
-                }`}
+                  }`}
               >
                 {column.header}
               </th>
@@ -193,13 +191,12 @@ export function DataTable<T>({
                   onKeyDown={(event) => onKeyDown(event, index, row)}
                   onFocus={() => setFocused(index)}
                   style={{ height }}
-                  className={`border-b border-line outline-offset-[-2px] ${
-                    isSelected
+                  className={`border-b border-line outline-offset-[-2px] ${isSelected
                       ? 'bg-accent-soft'
                       : isActive
                         ? 'bg-sunken'
                         : 'bg-surface hover:bg-sunken'
-                  }`}
+                    }`}
                 >
                   {selection && (
                     <td className="sticky left-0 z-10 w-9 bg-inherit px-2">
@@ -218,11 +215,10 @@ export function DataTable<T>({
                     <td
                       key={column.id}
                       style={column.width ? { width: column.width } : undefined}
-                      className={`px-3 ${column.align === 'right' ? 'text-right' : ''} ${
-                        columnIndex === 0
+                      className={`px-3 ${column.align === 'right' ? 'text-right' : ''} ${columnIndex === 0
                           ? `sticky z-10 border-r border-line bg-inherit ${selection ? 'left-9' : 'left-0'}`
                           : ''
-                      }`}
+                        }`}
                     >
                       {column.render(row)}
                     </td>

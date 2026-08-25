@@ -2,7 +2,7 @@ import { formatINR } from '@storefront/lib/currency'
 import type { ProductPerformance } from '../../lib/analysis'
 import { formatCount, relativeDays } from '../../lib/format'
 import { useDataset } from '../../lib/datasetContext'
-import { stockLines, coverBand, COVER_DOT, COVER_LABEL } from '../../lib/inventory'
+import { stockLines, coverBand, COVER_DOT, COVER_LABEL, COVER_SHORT } from '../../lib/inventory'
 import { TEA_TYPES, variantKey, type TeaType } from '../../lib/ops'
 import { navigate } from '../../lib/router'
 import { Drawer } from '../ui/Drawer'
@@ -15,14 +15,14 @@ import { StarIcon } from '../ui/Icons'
 /* ────────────────────────────────────────────────────────────────────────────
  * The product editor.
  *
- * The tiers used to be a stacked list — one block per variant, each repeating
+ * The tiers used to be a stacked list – one block per variant, each repeating
  * the same five labels. That is the shape you reach for when there are two
  * variants and the shape that fails at six: you cannot compare a column of
  * numbers that never lines up, and comparing tiers is the entire reason to open
  * this panel.
  *
  * So it is a matrix. Rows are variants, columns are the fields, and the two
- * fields this dashboard owns — trade price and MOQ — are editable in place.
+ * fields this dashboard owns – trade price and MOQ – are editable in place.
  * Retail and status stay read-only, because they live in the storefront's
  * catalogue and a second editable copy here would be a second truth.
  *
@@ -47,7 +47,7 @@ export function ProductDrawer({ row, onClose }: { row: ProductPerformance | null
     if (!current) return
     const previous = current[field]
     if (!updateVariantOps(key, { [field]: Number(next) })) {
-      notify(`Storage refused the write — ${label} is unchanged`, 'error')
+      notify(`Storage refused the write – ${label} is unchanged`, 'error')
       return
     }
     notify(`${sku}: ${label} updated`, {
@@ -104,7 +104,7 @@ export function ProductDrawer({ row, onClose }: { row: ProductPerformance | null
             </Button>
           </div>
 
-          <div className="mt-1.5 overflow-x-auto rounded-lg border border-line">
+          <div className="mt-1.5 overflow-x-auto rounded-lg neu-raised">
             <table className="w-full border-collapse text-left text-sm">
               <caption className="sr-only">
                 Variants of {product.name}: SKU, weight, retail and trade price, minimum order and stock
@@ -141,7 +141,7 @@ export function ProductDrawer({ row, onClose }: { row: ProductPerformance | null
                       </td>
                       <td className="px-2 text-right text-body">{entry.grams} g</td>
                       <td className="px-2 text-right text-body" title="Set in the storefront catalogue">
-                        {variant.price > 0 ? formatINR(variant.price) : '—'}
+                        {variant.price > 0 ? formatINR(variant.price) : ''}
                       </td>
                       <td className="px-2 text-right">
                         <EditableCell
@@ -163,16 +163,20 @@ export function ProductDrawer({ row, onClose }: { row: ProductPerformance | null
                         />
                       </td>
                       <td className="px-2 text-right">
-                        <span className="inline-flex items-center justify-end gap-1.5">
+                        <span
+                          className="inline-grid grid-cols-[0.5rem_2.75rem_3.25rem] items-center gap-2"
+                          title={COVER_LABEL[band]}
+                        >
                           <span
-                            className={`h-2 w-2 shrink-0 rounded-full ${COVER_DOT[band]}`}
+                            className={`h-2 w-2 rounded-full ${COVER_DOT[band]}`}
                             aria-hidden="true"
                           />
-                          <span className="text-ink">{formatCount(line?.onHand ?? 0)}</span>
-                          <span className="text-xs text-muted">
+                          <span className="text-right text-ink">{formatCount(line?.onHand ?? 0)}</span>
+                          <span className="text-right text-xs text-muted">
                             {line?.daysOfCover === null || line === undefined
-                              ? COVER_LABEL[band]
+                              ? COVER_SHORT[band]
                               : `${line.daysOfCover}d`}
+                            <span className="sr-only"> – {COVER_LABEL[band]}</span>
                           </span>
                         </span>
                       </td>
@@ -192,7 +196,7 @@ export function ProductDrawer({ row, onClose }: { row: ProductPerformance | null
         {product.origin && (
           <section>
             <h3 className="text-xs font-semibold uppercase tracking-wider text-muted">Origin</h3>
-            <dl className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-2 rounded-lg border border-line bg-surface p-3 text-sm">
+            <dl className="mt-1.5 grid grid-cols-2 gap-x-4 gap-y-2 rounded-lg bg-surface neu-raised p-3 text-sm">
               <Field label="Garden" value={product.origin.estate} />
               <Field label="Elevation" value={product.origin.elevation} />
               <Field label="Harvest" value={product.origin.harvest} />
@@ -207,7 +211,7 @@ export function ProductDrawer({ row, onClose }: { row: ProductPerformance | null
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-md border border-line bg-surface px-2 py-1.5">
+    <div className="rounded-md bg-surface neu-raised-sm px-2 py-1.5">
       <dt className="text-xs uppercase tracking-wider text-muted">{label}</dt>
       <dd className="mt-0.5 font-semibold text-ink">{value}</dd>
     </div>

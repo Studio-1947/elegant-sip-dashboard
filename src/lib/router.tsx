@@ -4,7 +4,7 @@
  * The storefront uses real paths because every route there must be a distinct
  * indexable URL. This app is the opposite: `noindex`, internal, and often
  * served from a sub-folder on XAMPP. A hash route needs no rewrite rule, so the
- * dashboard drops into any static host — including a plain file copy — without
+ * dashboard drops into any static host – including a plain file copy – without
  * a matching .htaccess.
  *
  * Everything that scopes a screen lives in the URL:
@@ -41,7 +41,7 @@ export interface Route {
   id: RouteId
   /** Second path segment, e.g. the order number in #/orders/ES-1042. */
   param?: string
-  /** Everything after `?` — filters, sort, density, saved view. */
+  /** Everything after `?`  filters, sort, density, saved view. */
   query: Query
 }
 
@@ -88,7 +88,7 @@ export function parseHash(hash: string): Route {
 
   const query: Query = {}
   for (const [key, value] of new URLSearchParams(search)) {
-    // An empty param is the same as an absent one — it keeps `?stage=` out of
+    // An empty param is the same as an absent one – it keeps `?stage=` out of
     // URLs when a filter is cleared.
     if (value) query[key] = value
   }
@@ -117,7 +117,7 @@ export function hrefFor(id: RouteId, target: Target = {}): string {
 }
 
 /**
- * `replace` rewrites the current entry instead of adding one — for changes a
+ * `replace` rewrites the current entry instead of adding one – for changes a
  * user makes continuously (typing) rather than deliberately (choosing).
  */
 export function navigate(id: RouteId, target: Target = {}, replace = false) {
@@ -143,7 +143,7 @@ export function useNavigate() {
  * Read and write one screen's view state through the URL.
  *
  * `defaults` does double duty: it types the state, and a value equal to its
- * default is omitted from the URL — so the address bar shows the constraints
+ * default is omitted from the URL – so the address bar shows the constraints
  * that are actually on, and a link carries no noise.
  */
 export function useQueryState<T extends Query>(defaults: T) {

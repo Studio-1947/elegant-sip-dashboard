@@ -1,4 +1,4 @@
-import { shareColor, shareTextClass } from './chartUtils'
+import { shareColor, shareTextColor } from './chartUtils'
 
 export interface Share {
   id: string
@@ -6,7 +6,7 @@ export interface Share {
   value: number
   /**
    * Fixed palette slot for this entity. Colour follows the product, never its
-   * current rank — otherwise changing the date range repaints the survivors and
+   * current rank – otherwise changing the date range repaints the survivors and
    * a reader who learned "Fannings is the pale one" is misled.
    */
   colorIndex?: number
@@ -16,7 +16,7 @@ export interface Share {
  * Part-to-whole as a single 100% bar rather than a donut: the segments here are
  * often close in size, and close values are exactly what a pie cannot show.
  *
- * Segments are separated by a 2px gap in the surface colour — never a stroke
+ * Segments are separated by a 2px gap in the surface colour – never a stroke
  * around each fill, which would add ink that isn't data. An in-segment label is
  * only drawn when it measurably fits; otherwise the legend and the table carry it.
  */
@@ -35,7 +35,7 @@ export function ShareBar({
 
   return (
     <div className="px-3 py-2">
-      <div className="flex h-8 w-full gap-[2px] overflow-hidden rounded-sm">
+      <div className="flex h-9 w-full gap-[3px] overflow-hidden rounded-md bg-sunken p-[3px] neu-pressed-sm">
         {shares.map((share, index) => {
           const percent = (share.value / total) * 100
           if (percent <= 0) return null
@@ -43,14 +43,17 @@ export function ShareBar({
           return (
             <div
               key={share.id}
-              className="flex items-center justify-center first:rounded-l-sm last:rounded-r-sm"
+              className="flex items-center justify-center rounded-xs first:rounded-l-sm last:rounded-r-sm"
               style={{ width: `${percent}%`, background: shareColor(slot) }}
               title={`${share.label}: ${formatValue(share.value)} (${percent.toFixed(1)}%)`}
             >
-              {/* ~4.5 characters per 10% at this height — anything tighter is
+              {/* ~4.5 characters per 10% at this height – anything tighter is
                   left to the legend rather than clipped. */}
               {percent >= 12 && (
-                <span className={`px-1 text-xs font-semibold ${shareTextClass(slot)}`}>
+                <span
+                  className="px-1 text-xs font-semibold"
+                  style={{ color: shareTextColor(slot) }}
+                >
                   {percent.toFixed(0)}%
                 </span>
               )}
@@ -64,7 +67,7 @@ export function ShareBar({
           <li key={share.id} className="flex items-center justify-between gap-3 text-sm">
             <span className="flex min-w-0 items-center gap-2">
               <span
-                className="h-2.5 w-2.5 shrink-0 rounded-sm"
+                className="h-2.5 w-2.5 shrink-0 rounded-full"
                 style={{ background: shareColor(share.colorIndex ?? index) }}
                 aria-hidden="true"
               />

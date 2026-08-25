@@ -9,7 +9,7 @@ import { formatDate } from '../../lib/format'
 import { BoxIcon, OrdersIcon, PeopleIcon, SearchIcon } from '../ui/Icons'
 
 /* ────────────────────────────────────────────────────────────────────────────
- * ⌘K — one field over orders, SKUs and customers.
+ * ⌘K – one field over orders, SKUs and customers.
  *
  * The point is that you do not have to know which screen a thing lives on. An
  * order number, half a customer's email and a SKU fragment all go in the same
@@ -17,7 +17,7 @@ import { BoxIcon, OrdersIcon, PeopleIcon, SearchIcon } from '../ui/Icons'
  *
  * Results are capped per group rather than globally, so a common surname cannot
  * crowd out the one matching SKU. Everything is a plain substring match over
- * data already in memory — no index to build, and no reason for this to take
+ * data already in memory – no index to build, and no reason for this to take
  * longer than a keystroke.
  * ──────────────────────────────────────────────────────────────────────────── */
 
@@ -120,14 +120,17 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
         type="button"
         aria-label="Close search"
         onClick={onClose}
-        className="absolute inset-0 h-full w-full animate-overlay-in cursor-default bg-ink/35"
+        className="absolute inset-0 h-full w-full animate-overlay-in cursor-default bg-scrim"
       />
       <div
         ref={ref}
         role="dialog"
         aria-modal="true"
         aria-label="Search orders, SKUs and customers"
-        className="relative flex h-max max-h-[70vh] w-full max-w-xl animate-drawer-in flex-col overflow-hidden rounded-lg border border-line bg-surface shadow-overlay"
+        /* A plain panel: no shadow, no border, in either theme. The scrim behind
+           it already separates it from the page, and stacking an extrusion on
+           top of a dimmed backdrop was two answers to the same question. */
+        className="relative flex h-max max-h-[70vh] w-full max-w-xl animate-drawer-in flex-col overflow-hidden rounded-lg bg-canvas"
       >
         <div className="flex items-center gap-2 border-b border-line px-3">
           <span className="h-4 w-4 shrink-0 text-faint">
@@ -143,9 +146,14 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
             onKeyDown={onKeyDown}
             placeholder="Order number, SKU, customer…"
             aria-label="Search orders, SKUs and customers"
-            className="h-11 w-full bg-transparent text-md text-ink placeholder:text-faint focus-visible:outline-none"
+            /* No focus ring here. The palette is a modal whose only purpose is this
+               field, it is autofocused on open, and arrow keys drive the results
+               without focus ever leaving it – so the ring is permanently on and
+               therefore says nothing. The caret carries it instead, tinted to the
+               accent. Tabbing on to a result still rings that result normally. */
+            className="h-11 w-full bg-transparent text-md text-ink caret-accent placeholder:text-faint focus-ring-none"
           />
-          <kbd className="shrink-0 rounded-sm border border-line px-1.5 py-0.5 text-xs text-muted">Esc</kbd>
+          <kbd className="shrink-0 rounded-sm bg-sunken px-1.5 py-0.5 text-xs text-muted neu-pressed-sm">Esc</kbd>
         </div>
 
         <div className="min-h-0 flex-1 overflow-y-auto py-1">
@@ -173,9 +181,8 @@ export function CommandPalette({ open, onClose }: { open: boolean; onClose: () =
                     onClick={() => choose(hit)}
                     onMouseEnter={() => setCursor(index)}
                     aria-current={index === cursor}
-                    className={`flex w-full items-center gap-2.5 px-3 py-1.5 text-left ${
-                      index === cursor ? 'bg-accent-soft' : ''
-                    }`}
+                    className={`flex w-full items-center gap-2.5 px-3 py-1.5 text-left ${index === cursor ? 'bg-accent-soft' : ''
+                      }`}
                   >
                     <span className="h-4 w-4 shrink-0 text-faint">
                       <hit.Icon />

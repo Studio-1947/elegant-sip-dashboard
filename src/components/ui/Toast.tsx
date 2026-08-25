@@ -6,7 +6,7 @@ import { AlertIcon, CheckIcon, UndoIcon } from './Icons'
  *
  * This app does not ask "are you sure?". An action happens immediately, and the
  * toast that reports it carries the way back. That is faster for the common case
- * (the action was intended) and no worse for the rare one — with the single
+ * (the action was intended) and no worse for the rare one – with the single
  * exception of genuinely destructive work, which uses type-to-confirm instead.
  *
  * A toast with an undo lives longer than one without: four seconds is enough to
@@ -36,7 +36,7 @@ const ToastContext = createContext<Notify | undefined>(undefined)
 const PLAIN_MS = 4200
 const UNDO_MS = 10_000
 
-/** Confirmations for actions that actually happened — a write that failed
+/** Confirmations for actions that actually happened – a write that failed
     (storage quota, private mode) reports the failure rather than a tick. */
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<ToastMessage[]>([])
@@ -66,7 +66,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   /* Pointing at the stack stops every countdown; leaving it restarts each one
      from full. Restarting from full rather than from what was left is the
-     forgiving direction to round in — the cost is a toast that lingers, and the
+     forgiving direction to round in – the cost is a toast that lingers, and the
      alternative cost is an undo that vanishes while it is being read. */
   const pause = useCallback(() => {
     for (const timer of timers.current.values()) window.clearTimeout(timer)
@@ -101,13 +101,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         {messages.map((message) => (
           <div
             key={message.id}
-            className={`pointer-events-auto flex animate-toast-in items-center gap-2 rounded-md border py-1.5 pl-3 text-sm shadow-overlay ${
-              message.action ? 'pr-1.5' : 'pr-3'
-            } ${
-              message.tone === 'error'
-                ? 'border-critical/30 bg-surface text-critical'
-                : 'border-ink bg-ink text-white'
-            }`}
+            className={`pointer-events-auto flex animate-toast-in items-center gap-2 rounded-lg bg-surface py-2 pl-3.5 text-sm neu-raised-lg ${message.action ? 'pr-2' : 'pr-3.5'
+              } ${message.tone === 'error' ? 'text-critical' : 'text-ink'}`}
           >
             <span className="h-3.5 w-3.5 shrink-0">
               {message.tone === 'error' ? <AlertIcon /> : <CheckIcon />}
@@ -120,11 +115,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                   message.action?.onClick()
                   dismiss(message.id)
                 }}
-                className={`ml-1 inline-flex h-7 items-center gap-1 rounded-sm px-2 text-xs font-semibold ${
-                  message.tone === 'error'
-                    ? 'text-critical hover:bg-critical-soft'
-                    : 'text-white hover:bg-white/15'
-                }`}
+                className="ml-1 inline-flex h-7 items-center gap-1 rounded-md bg-surface px-2.5 text-xs font-semibold text-accent neu-raised-sm active:neu-pressed-sm"
               >
                 <span className="h-3 w-3">
                   <UndoIcon />

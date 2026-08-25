@@ -1,6 +1,6 @@
 /* ────────────────────────────────────────────────────────────────────────────
  * Modal plumbing: focus trap, focus restoration, Escape to close, scroll lock.
- * Every overlay in the app uses this — a dialog that leaks focus to the page
+ * Every overlay in the app uses this – a dialog that leaks focus to the page
  * behind it strands keyboard and screen-reader users.
  * ──────────────────────────────────────────────────────────────────────────── */
 

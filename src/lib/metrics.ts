@@ -1,8 +1,8 @@
 /* ────────────────────────────────────────────────────────────────────────────
- * Order analytics — pure functions over PlacedOrder[], so they are unit
+ * Order analytics – pure functions over PlacedOrder[], so they are unit
  * testable and hold no opinion about where the orders came from.
  *
- * Revenue means `order.total`: goods, minus discount, plus shipping, plus GST —
+ * Revenue means `order.total`: goods, minus discount, plus shipping, plus GST 
  * the amount actually charged. Every tile that means something narrower says so
  * in its label (Goods, GST collected, Shipping charged).
  * ──────────────────────────────────────────────────────────────────────────── */
@@ -109,7 +109,7 @@ export function percentChange(current: number, previous: number): number | null 
 }
 
 /**
- * One point per calendar day across the whole window — including days with no
+ * One point per calendar day across the whole window – including days with no
  * orders. Skipping empty days would draw a line that implies steady trade
  * through a quiet week.
  */
@@ -137,7 +137,7 @@ export function dailySeries(orders: PlacedOrder[], range: RangeId, now: Date): D
   return [...buckets.values()]
 }
 
-/** Bucket order counts by weekday, Monday first — reads better for a tea shop. */
+/** Bucket order counts by weekday, Monday first – reads better for a tea shop. */
 export function byWeekday(orders: PlacedOrder[]): { label: string; orders: number; revenue: number }[] {
   const labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   const buckets = labels.map((label) => ({ label, orders: 0, revenue: 0 }))
@@ -160,7 +160,7 @@ export interface IntegrityIssue {
 /**
  * Re-run the storefront's own pricing over each order and compare. Because
  * orders live in editable localStorage, a mismatch means the record was hand
- * -edited or written by a build with different rates — either way the figure
+ * -edited or written by a build with different rates – either way the figure
  * should not silently feed a revenue chart. Surfaced on the Data page.
  */
 export function checkIntegrity(orders: PlacedOrder[]): IntegrityIssue[] {

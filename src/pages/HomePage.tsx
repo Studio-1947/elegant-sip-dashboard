@@ -25,7 +25,7 @@ import { RecentOrders } from '../components/panels/RecentOrders'
  * Answers one question, in this order: what needs me now, then how is it going.
  *
  * The exception list is the whole top of the screen. Trends sit below it,
- * behind a heading that says what they are — they are the thing you scroll to
+ * behind a heading that says what they are – they are the thing you scroll to
  * on purpose, not the thing that greets you. The deep analysis moved to Reports;
  * what is left here is the shape of the last few weeks, which is as much as a
  * home screen should try to say.
@@ -70,7 +70,7 @@ export default function HomePage() {
   const sparkline = series.slice(-12).map((point) => point.revenue)
 
   return (
-    <div className="flex flex-col gap-3 p-3">
+    <div className="flex flex-col gap-4 p-4">
       <ExceptionsPanel />
 
       <RecentOrders orders={scoped} />
@@ -96,7 +96,7 @@ export default function HomePage() {
           </FilterBar>
         </div>
 
-        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatTile
             label={`Revenue · ${rangeLabel}`}
             value={formatINR(totals.revenue)}
